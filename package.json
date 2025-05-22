@@ -1,8 +1,10 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "portal-lp-de-dados",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
