@@ -8,7 +8,7 @@ app.use(cors());
 
 const bigquery = new BigQuery({
   projectId: 'worlddata-439415',
-  keyFilename: path.join(__dirname, 'worlddata-439415-411820218e43.json'),
+  keyFilename: '/etc/secrets/keyfile.json',
 });
 
 app.get('/docs', async (req, res) => {
