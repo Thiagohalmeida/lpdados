@@ -1,67 +1,69 @@
-import React from 'react';
-import ProjectCard from './ProjectCard';
+import { useEffect, useState } from "react";
+import ProjectCard from "../components/ProjectCard";
 
-const projectsData = [
-  {
-    title: "Dashboard Comercial",
-    description: "Acompanhamento em tempo real de todos os indicadores da equipe comercial, com projeções e metas.",
-    link: "#",
-    tags: ["PowerBI", "Vendas", "KPIs"]
-  },
-  {
-    title: "Análise de Mercado",
-    description: "Comparativo entre concorrentes do setor, com análises de share de mercado e tendências.",
-    link: "#",
-    tags: ["Tableau", "Concorrentes", "Market Share"]
-  },
-  {
-    title: "BI Operacional",
-    description: "Monitoramento de KPIs operacionais, com alertas e notificações automáticas.",
-    link: "#",
-    tags: ["Looker", "Operações", "Monitoramento"]
-  },
-  {
-    title: "Previsões Financeiras",
-    description: "Modelos preditivos para análise de cenários financeiros e apoio à tomada de decisão.",
-    link: "#",
-    tags: ["Python", "Finanças", "Previsões"]
-  }
-];
+type Projeto = {
+  nome: string;
+  resumo: string;
+  status: string;
+  proximaAtualizacao: string;
+  link?: string;
+  area?: string;
+  ultimaEntrega?: string;
+};
 
-const Projects: React.FC = () => {
+export default function Projects() {
+  const [projetos, setProjetos] = useState<Projeto[]>([]);
+
+  useEffect(() => {
+    fetch("https://api.sheetbest.com/sheets/7f50c243-705f-4d02-84aa-ab6a09ad17f0")
+      .then((res) => res.json())
+      .then((data) => {
+        const projetosValidados = data.filter((p: Projeto) => p.nome && p.status);
+        setProjetos(projetosValidados);
+      });
+  }, []);
+
+  const statusAgrupado = {
+    "Entregue": projetos.filter((p) => p.status?.toLowerCase() === "entregue"),
+    "Em desenvolvimento": projetos.filter((p) => p.status?.toLowerCase() === "em desenvolvimento"),
+    "Standby": projetos.filter((p) => p.status?.toLowerCase() === "standby"),
+  };
+
   return (
-    <section id="projects" className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-text-primary mb-2">Projetos em Destaque</h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
-            Conheça nossos principais projetos de Business Intelligence desenvolvidos para impulsionar decisões baseadas em dados.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {projectsData.map((project, index) => (
-            <ProjectCard
-              key={index}
-              title={project.title}
-              description={project.description}
-              link={project.link}
-              tags={project.tags}
-            />
+    <section id="projects" className="bg-white py-12">
+      <div className="max-w-6xl mx-auto px-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-8">
+          Projetos da Área de BI
+        </h2>
+
+        <div className="space-y-12">
+          {Object.entries(statusAgrupado).map(([status, lista]) => (
+            <div key={status}>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {status}
+                  <span className="ml-2 text-sm text-gray-500">({lista.length})</span>
+                </h3>
+                <div className={`inline-block px-3 py-1 text-xs rounded-full ${
+                  status === "Entregue"
+                    ? "bg-green-100 text-green-800"
+                    : status === "Em desenvolvimento"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}>
+                  {status}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {lista.map((p, i) => (
+                  <ProjectCard key={i} {...p} />
+                ))}
+              </div>
+            </div>
           ))}
-        </div>
-        
-        <div className="text-center mt-12">
-          <a 
-            href="#" 
-            className="inline-flex items-center px-6 py-3 border border-brand-primary text-brand-primary font-medium rounded-full hover:bg-brand-primary hover:text-white transition duration-300"
-          >
-            Ver Todos os Projetos
-          </a>
         </div>
       </div>
     </section>
   );
-};
-
-export default Projects;
+}

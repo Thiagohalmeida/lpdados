@@ -1,35 +1,23 @@
-import React from 'react';
-
-const Hero: React.FC = () => {
+export default function Hero() {
   return (
-    <section className="bg-gradient-to-r from-brand-primary to-blue-800 text-white pt-24 pb-12">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
-            Portal BI ControlF5
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-100 animate-fade-in-delay">
-            Central de projetos e ferramentas de Business Intelligence
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-delay-2">
-            <a 
-              href="/login" 
-              className="bg-brand-secondary text-text-primary px-8 py-3 rounded-full font-semibold hover:bg-yellow-400 transition duration-300 shadow-lg"
-            >
-              Acessar Portal
-            </a>
-            <a 
-              href="#projects" 
-              className="bg-white bg-opacity-20 text-white px-8 py-3 rounded-full font-semibold hover:bg-opacity-30 transition duration-300 backdrop-blur-sm"
-            >
-              Ver Projetos
-            </a>
-          </div>
-        </div>
+    <section className="w-full bg-white py-24">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+      <div className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full inline-block mb-4">
+  Site em desenvolvimento, versão 1.0
+</div>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+          Central de Business Intelligence
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          Democratizando o acesso aos dados, processos e análises para impulsionar decisões estratégicas em toda a empresa.
+        </p>
+        <a
+          href="#projects"
+          className="inline-block bg-blue-600 text-white text-sm md:text-base font-semibold px-6 py-3 rounded-full shadow hover:bg-blue-700 transition"
+        >
+          Conheça nossos Projetos
+        </a>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
     </section>
   );
-};
-
-export default Hero;
+}
