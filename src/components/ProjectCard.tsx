@@ -1,60 +1,75 @@
-import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import { motion } from "framer-motion";
 
-interface ProjectCardProps {
-  title: string;
-  description: string;
-  imageUrl?: string;
-  link: string;
-  tags?: string[];
-}
+type ProjetoProps = {
+  nome: string;
+  resumo: string;
+  status: string;
+  proximaAtualizacao: string;
+  link?: string;
+  area?: string;
+  ultimaEntrega?: string;
+};
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ 
-  title, 
-  description, 
-  imageUrl, 
-  link, 
-  tags = [] 
-}) => {
+const statusClasses: Record<string, string> = {
+  "Entregue": "bg-green-100 text-green-800",
+  "Em desenvolvimento": "bg-yellow-100 text-yellow-800",
+  "Standby": "bg-red-100 text-red-700",
+};
+
+export default function ProjectCard({
+  nome,
+  resumo,
+  status,
+  proximaAtualizacao,
+  link,
+  area,
+  ultimaEntrega,
+}: ProjetoProps) {
+  const statusStyle = statusClasses[status] || "bg-gray-100 text-gray-800";
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg">
-      {imageUrl && (
-        <div className="h-48 bg-gray-200 overflow-hidden">
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-        </div>
+    <motion.div
+      className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition gap-2"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex justify-between items-start">
+        <h3 className="text-base font-semibold text-gray-900">{nome}</h3>
+        <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${statusStyle}`}>
+          {status}
+        </span>
+      </div>
+
+      {(area || ultimaEntrega) && (
+        <p className="text-[10px] text-gray-500 italic mt-1">
+          {area && <span>{area}</span>}
+          {area && ultimaEntrega && " • "}
+          {ultimaEntrega && <span>Última entrega: {ultimaEntrega}</span>}
+        </p>
       )}
-      <div className="p-6">
-        <h3 className="text-xl font-semibold text-text-primary mb-2">{title}</h3>
-        <p className="text-text-secondary mb-4">{description}</p>
-        
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {tags.map((tag, index) => (
-              <span 
-                key={index}
-                className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-text-secondary"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        
-        <a 
+
+      {resumo && (
+        <p className="text-xs text-gray-700 mt-2 mb-2 line-clamp-5">{resumo}</p>
+      )}
+
+      {proximaAtualizacao && (
+        <p className="text-[10px] text-gray-600 mt-1 mb-2">
+          <strong>Próxima atualização:</strong> {proximaAtualizacao}
+        </p>
+      )}
+
+      {link && (
+        <a
           href={link}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center text-brand-primary hover:text-blue-700 font-medium"
+          className="inline-block mt-auto bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full hover:bg-blue-700 transition"
         >
-          Acessar <ExternalLink className="ml-1 h-4 w-4" />
+          Ver mais
         </a>
-      </div>
-    </div>
+      )}
+    </motion.div>
   );
-};
-
-export default ProjectCard;
+}
