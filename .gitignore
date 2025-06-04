@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 .env
 worlddata-439415-411820218e43.json
+keyfile.json
