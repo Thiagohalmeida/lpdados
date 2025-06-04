@@ -15,7 +15,7 @@ export default function Pesquisas() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://lpdados.onrender.com/pesquisas')
+    fetch('https://lpdados.onrender.com/api/pesquisas')
       .then(res => res.json())
       .then(data => {
         const mapped = data.map((item: any) => ({

@@ -12,7 +12,7 @@ export default function Docs() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://lpdados.onrender.com/docs')
+    fetch('https://lpdados.onrender.com/api/docs')
       .then((res) => res.json())
       .then((data) => {
         console.log('Dados recebidos:', data);  // ✅ Adicione esse log!
