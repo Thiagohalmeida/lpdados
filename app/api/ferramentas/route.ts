@@ -1,0 +1,14 @@
+import { BigQuery } from '@google-cloud/bigquery';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+const bigquery = new BigQuery();
+
+export async function GET(_req: NextRequest) {
+  const query = `SELECT Nome, Descricao, Link, ProxAtualizacao 
+                 FROM \`worlddata-439415.lpdados.ferramentas\``;
+  const options = { query };
+  const [rows] = await bigquery.query(options);
+  return NextResponse.json(rows);
+}
+  
