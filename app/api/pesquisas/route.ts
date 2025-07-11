@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server';
 import { BigQuery } from '@google-cloud/bigquery';
 
 const bigquery = new BigQuery({
+  credentials: process.env.GOOGLE_CREDENTIALS_JSON
+    ? JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
+    : undefined,
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  projectId: 'worlddata-439415',
+  projectId: process.env.PROJECT_ID || 'worlddata-439415',
 });
 
 export async function GET() {

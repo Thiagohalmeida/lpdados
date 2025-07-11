@@ -3,7 +3,13 @@ import { BigQuery } from '@google-cloud/bigquery';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const bigquery = new BigQuery();  // uses credentials from env or GCP setup
+const bigquery = new BigQuery({
+  credentials: process.env.GOOGLE_CREDENTIALS_JSON
+    ? JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
+    : undefined,
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  projectId: process.env.PROJECT_ID || 'worlddata-439415',
+});
 
 export async function GET(_req: NextRequest) {
   try {
