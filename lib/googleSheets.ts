@@ -45,3 +45,11 @@ export async function getFerramentasFromBigQuery() {
   const [rows] = await bigquery.query({ query });
   return rows;
 }
+
+export async function getProjetosFromBigQuery() {
+  const query = `
+    SELECT * FROM \`worlddata-439415.lpdados.projeto\` LIMIT 100
+  `;
+  const [rows] = await bigquery.query({ query });
+  return rows;
+}

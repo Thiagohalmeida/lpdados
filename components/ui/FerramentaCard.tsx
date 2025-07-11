@@ -1,37 +1,66 @@
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Calendar } from "lucide-react";
+import { ExternalLink, BarChart3, Database, FileText, TrendingUp } from "lucide-react";
 
-type Ferramenta = {
-  Nome: string;
-  Descricao: string;
-  Link: string;
-  ProxAtualizacao?: string;
+interface FerramentaCardProps {
+  nome: string;
+  descricao: string;
+  link: string;
+  proxAtualizacao?: string;
+}
+
+// Defina cores e ícones por nome ou ordem
+const CARD_STYLES: Record<string, { color: string; icon: React.ReactNode; button: string }> = {
+  "Consulta Banco": {
+    color: "border-l-4 border-l-blue-400",
+    icon: <Database className="h-8 w-8 text-blue-500" />,
+    button: "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600",
+  },
+  "Insights Automáticos": {
+    color: "border-l-4 border-l-purple-400",
+    icon: <BarChart3 className="h-8 w-8 text-purple-500" />,
+    button: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
+  },
+  "Consulta Fornecedores": {
+    color: "border-l-4 border-l-yellow-400",
+    icon: <TrendingUp className="h-8 w-8 text-yellow-400" />,
+    button: "bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-500 hover:to-pink-600",
+  },
+  // Adicione mais conforme necessário
 };
 
-export function FerramentaCard({ item }: { item: Ferramenta }) {
+export default function FerramentaCard({ nome, descricao, link, proxAtualizacao }: FerramentaCardProps) {
+  const style = CARD_STYLES[nome] || {
+    color: "border-l-4 border-l-blue-400",
+    icon: <FileText className="h-8 w-8 text-blue-600" />,
+    button: "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-all duration-300">
-      <CardHeader>
-        <span className="font-bold text-lg">{item.Nome}</span>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-zinc-700 mb-4">{item.Descricao}</p>
-        <div className="flex items-center justify-between">
-          {item.ProxAtualizacao && (
-            <Badge variant="outline" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-blue-500" />
-              {item.ProxAtualizacao}
-            </Badge>
-          )}
-          <Button asChild className="ml-auto">
-            <a href={item.Link} target="_blank" rel="noopener noreferrer">
-              Acessar <ExternalLink className="ml-2 w-4 h-4" />
-            </a>
-          </Button>
+    <div className={`flex flex-col md:flex-row items-center bg-white rounded-2xl shadow-md border p-6 gap-4 mb-4 ${style.color}`}>
+      <div className="flex flex-col items-center justify-center mr-6">
+        <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-2 bg-gradient-to-r from-blue-100 to-purple-100">
+          {style.icon}
         </div>
-      </CardContent>
-    </Card>
+        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Ativo</span>
+      </div>
+      <div className="flex-1 w-full">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-bold text-zinc-900 mb-1">{nome}</h2>
+          {proxAtualizacao && (
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 ml-2">
+              Próxima Atualização: {proxAtualizacao}
+            </span>
+          )}
+        </div>
+        <p className="text-sm text-zinc-700 mb-4">{descricao}</p>
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl text-white ${style.button} transition`}
+        >
+          Acessar <ExternalLink size={16} />
+        </a>
+      </div>
+    </div>
   );
 }
