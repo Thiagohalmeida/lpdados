@@ -296,9 +296,8 @@ export default function BIPortfolioPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 bg-transparent"
                         variant="outline"
-                        className="border-yellow-300 hover:bg-yellow-50"
+                        className="flex-1 bg-transparent border-yellow-300 hover:bg-yellow-50"
                       >
                         <Calendar className="h-3 w-3 mr-1" />
                         Agendar Kickoff
