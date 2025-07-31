@@ -1,3 +1,5 @@
+// app/api/docs/route.ts
+
 import { NextResponse } from 'next/server';
 import { getDocsFromBigQuery } from '@/lib/googleSheets';
 
