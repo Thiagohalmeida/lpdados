@@ -4,15 +4,14 @@ import { ArrowLeft, ExternalLink, FileText, Calendar, User, Building2, MessageSq
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { getAppBaseUrl } from '@/lib/runtime-url';
 
 async function getProjeto(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projetos`, {
-    cache: 'no-store',
-  });
-  
-  if (!res.ok) return null;
-  
-  const projetos = await res.json();
+  try {
+    const baseUrl = await getAppBaseUrl();
+    const res = await fetch(`${baseUrl}/api/projetos`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const projetos = await res.json();
   
   // Função para normalizar string (remove acentos e converte para kebab-case)
   const normalizeForUrl = (str: string) => {
@@ -41,7 +40,11 @@ async function getProjeto(id: string) {
     if (withData) return withData;
   }
   
-  return matches[0] || null;
+    return matches[0] || null;
+  } catch (error) {
+    console.error('Erro ao carregar detalhes de projeto:', error);
+    return null;
+  }
 }
 
 export default async function ProjetoDetalhes({ params }: { params: Promise<{ id: string }> }) {

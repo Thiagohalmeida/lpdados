@@ -10,6 +10,23 @@ const bigquery = new BigQuery({
   projectId: process.env.PROJECT_ID || 'worlddata-439415',
 });
 
+function normalizeStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item ?? '').trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
 export async function GET() {
   try {
     // Usar a view de projetos que filtra por tipo='projeto'
@@ -41,7 +58,7 @@ export async function GET() {
         link: out.link || out.Link || '',
         docs: out.docs || out.Docs || '',
         area: out.area || out.Area || 'Geral',
-        tecnologias: out.tecnologias || out.Tecnologias || [],
+        tecnologias: normalizeStringArray(out.tecnologias ?? out.Tecnologias),
         data_inicio: out.data_inicio || null,
         ultima_atualizacao: out.ultima_atualizacao || null,
         responsavel: out.responsavel || null,

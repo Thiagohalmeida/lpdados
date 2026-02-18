@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, User, Building2, MessageSquare, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { getAppBaseUrl } from '@/lib/runtime-url';
 
 interface DashboardDocInsight {
   insight_id: string;
@@ -33,13 +34,11 @@ interface DashboardDocsPayload {
 }
 
 async function getDashboard(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/dashboards`, {
-    cache: 'no-store',
-  });
-
-  if (!res.ok) return null;
-
-  const dashboards = await res.json();
+  try {
+    const baseUrl = await getAppBaseUrl();
+    const res = await fetch(`${baseUrl}/api/dashboards`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const dashboards = await res.json();
 
   const normalizeForUrl = (str: string) => {
     return str
@@ -50,21 +49,27 @@ async function getDashboard(id: string) {
       .replace(/[^\w-]/g, '');
   };
 
-  return dashboards.find((d: any) => {
-    const normalizedNome = d.nome ? normalizeForUrl(d.nome) : '';
-    const normalizedId = normalizeForUrl(id);
-    return d.id === id || normalizedNome === normalizedId;
-  });
+    return dashboards.find((d: any) => {
+      const normalizedNome = d.nome ? normalizeForUrl(d.nome) : '';
+      const normalizedId = normalizeForUrl(id);
+      return d.id === id || normalizedNome === normalizedId;
+    });
+  } catch (error) {
+    console.error('Erro ao carregar detalhes de dashboard:', error);
+    return null;
+  }
 }
 
 async function getDashboardDocs(dashboardId: string): Promise<DashboardDocsPayload | null> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/dashboard-docs/${dashboardId}`,
-    { cache: 'no-store' }
-  );
-
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const baseUrl = await getAppBaseUrl();
+    const res = await fetch(`${baseUrl}/api/dashboard-docs/${dashboardId}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('Erro ao carregar docs do dashboard:', error);
+    return null;
+  }
 }
 
 export default async function DashboardDetalhes({ params }: { params: Promise<{ id: string }> }) {
