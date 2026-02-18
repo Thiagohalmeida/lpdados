@@ -3,30 +3,11 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, User, Building2, MessageSquare, Wrench } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getAppBaseUrl } from '@/lib/runtime-url';
+import { findPortalItemByIdOrSlug } from '@/lib/detail-data';
 
 async function getFerramenta(id: string) {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/ferramentas`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const ferramentas = await res.json();
-  
-  // Função para normalizar string (remove acentos e converte para kebab-case)
-  const normalizeForUrl = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/[^\w-]/g, ''); // Remove caracteres especiais exceto hífens
-  };
-  
-    return ferramentas.find((f: any) => {
-      const normalizedNome = f.nome ? normalizeForUrl(f.nome) : '';
-      const normalizedId = normalizeForUrl(id);
-      return f.id === id || normalizedNome === normalizedId;
-    });
+    return await findPortalItemByIdOrSlug('ferramenta', id);
   } catch (error) {
     console.error('Erro ao carregar detalhes de ferramenta:', error);
     return null;

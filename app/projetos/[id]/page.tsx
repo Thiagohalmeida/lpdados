@@ -4,43 +4,11 @@ import { ArrowLeft, ExternalLink, FileText, Calendar, User, Building2, MessageSq
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getAppBaseUrl } from '@/lib/runtime-url';
+import { findPortalItemByIdOrSlug } from '@/lib/detail-data';
 
 async function getProjeto(id: string) {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/projetos`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const projetos = await res.json();
-  
-  // Função para normalizar string (remove acentos e converte para kebab-case)
-  const normalizeForUrl = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/[^\w-]/g, ''); // Remove caracteres especiais exceto hífens
-  };
-  
-  // Buscar por ID exato primeiro
-  const byId = projetos.find((p: any) => p.id === id);
-  if (byId) return byId;
-  
-  // Buscar por nome normalizado - filtrar todos que correspondem
-  const normalizedId = normalizeForUrl(id);
-  const matches = projetos.filter((p: any) => {
-    const normalizedNome = p.nome ? normalizeForUrl(p.nome) : '';
-    return normalizedNome === normalizedId;
-  });
-  
-  // Se houver múltiplos matches, priorizar o que tem dados de gestão
-  if (matches.length > 1) {
-    const withData = matches.find((p: any) => p.responsavel || p.cliente || p.observacao);
-    if (withData) return withData;
-  }
-  
-    return matches[0] || null;
+    return await findPortalItemByIdOrSlug('projeto', id);
   } catch (error) {
     console.error('Erro ao carregar detalhes de projeto:', error);
     return null;

@@ -4,30 +4,11 @@ import { ArrowLeft, ExternalLink, Calendar, User, Building2, MessageSquare, Book
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getAppBaseUrl } from '@/lib/runtime-url';
+import { findPesquisaByIdOrSlug } from '@/lib/detail-data';
 
 async function getPesquisa(id: string) {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/pesquisas`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const pesquisas = await res.json();
-  
-  // Função para normalizar string (remove acentos e converte para kebab-case)
-  const normalizeForUrl = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/[^\w-]/g, ''); // Remove caracteres especiais exceto hífens
-  };
-  
-    return pesquisas.find((p: any) => {
-      const normalizedTitulo = p.titulo ? normalizeForUrl(p.titulo) : '';
-      const normalizedId = normalizeForUrl(id);
-      return p.id === id || normalizedTitulo === normalizedId;
-    });
+    return await findPesquisaByIdOrSlug(id);
   } catch (error) {
     console.error('Erro ao carregar detalhes de pesquisa:', error);
     return null;

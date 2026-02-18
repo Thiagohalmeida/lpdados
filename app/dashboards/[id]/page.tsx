@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, User, Building2, MessageSquare, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getAppBaseUrl } from '@/lib/runtime-url';
+import { findPortalItemByIdOrSlug } from '@/lib/detail-data';
+import { getDashboardDocsPayload } from '@/lib/dashboard-docs';
 
 interface DashboardDocInsight {
   insight_id: string;
@@ -35,25 +36,7 @@ interface DashboardDocsPayload {
 
 async function getDashboard(id: string) {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/dashboards`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const dashboards = await res.json();
-
-  const normalizeForUrl = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]/g, '');
-  };
-
-    return dashboards.find((d: any) => {
-      const normalizedNome = d.nome ? normalizeForUrl(d.nome) : '';
-      const normalizedId = normalizeForUrl(id);
-      return d.id === id || normalizedNome === normalizedId;
-    });
+    return await findPortalItemByIdOrSlug('dashboard', id);
   } catch (error) {
     console.error('Erro ao carregar detalhes de dashboard:', error);
     return null;
@@ -62,10 +45,7 @@ async function getDashboard(id: string) {
 
 async function getDashboardDocs(dashboardId: string): Promise<DashboardDocsPayload | null> {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/dashboard-docs/${dashboardId}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return res.json();
+    return await getDashboardDocsPayload(dashboardId);
   } catch (error) {
     console.error('Erro ao carregar docs do dashboard:', error);
     return null;

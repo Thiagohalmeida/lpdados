@@ -3,30 +3,11 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, User, Building2, MessageSquare, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getAppBaseUrl } from '@/lib/runtime-url';
+import { findPortalItemByIdOrSlug } from '@/lib/detail-data';
 
 async function getDoc(id: string) {
   try {
-    const baseUrl = await getAppBaseUrl();
-    const res = await fetch(`${baseUrl}/api/docs`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const docs = await res.json();
-  
-  // Função para normalizar string (remove acentos e converte para kebab-case)
-  const normalizeForUrl = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/[^\w-]/g, ''); // Remove caracteres especiais exceto hífens
-  };
-  
-    return docs.find((d: any) => {
-      const normalizedNome = d.nome ? normalizeForUrl(d.nome) : '';
-      const normalizedId = normalizeForUrl(id);
-      return d.id === id || normalizedNome === normalizedId;
-    });
+    return await findPortalItemByIdOrSlug('documentacao', id);
   } catch (error) {
     console.error('Erro ao carregar detalhes de documentacao:', error);
     return null;
