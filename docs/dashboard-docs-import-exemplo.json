@@ -1,0 +1,416 @@
+{
+  "mode": "replace",
+  "dashboard_id": "80f49ea1-594c-49a3-b8fe-deb6c4b7333f",
+  "version": "1.0.0",
+  "generated_at": "2026-02-11T10:00:00Z",
+  "source": "Dashboard de BI | Visao - Control",
+  "views": [
+    {
+      "view_id": "crm",
+      "title": "CRM",
+      "view_type": "mixed",
+      "sort_order": 1,
+      "status": "ativo",
+      "metric_owner": "Time BI",
+      "data_source": "CRM + Email Platform",
+      "insights": [
+        {
+          "insight_id": "conversion_trend",
+          "title": "Tendencia de conversao no CRM",
+          "description": "A taxa de conversao mostra ganho consistente em dias com maior volume de e-mails entregues.",
+          "notes": [
+            "Comparar com sazonalidade semanal",
+            "Validar impacto por segmento de base"
+          ],
+          "tags": [
+            "crm",
+            "conversao",
+            "email"
+          ],
+          "sort_order": 1
+        },
+        {
+          "insight_id": "top_emails",
+          "title": "Top 10 e-mails por performance",
+          "description": "Os e-mails com melhor CTR concentram o maior volume de conversoes no periodo.",
+          "notes": [
+            "Reaplicar estrutura de assunto",
+            "Testar horario dos disparos"
+          ],
+          "tags": [
+            "email",
+            "ctr",
+            "benchmark"
+          ],
+          "sort_order": 2
+        }
+      ],
+      "glossary_fields": [
+        {
+          "field_id": "conversion_rate",
+          "name": "Taxa de Conversao",
+          "description": "Percentual de visitantes que viraram conversao no periodo.",
+          "formula": "(conversoes / visitantes) * 100",
+          "example": "5.8",
+          "unit": "%",
+          "tags": [
+            "kpi",
+            "crm"
+          ],
+          "sort_order": 1
+        },
+        {
+          "field_id": "emails_delivered",
+          "name": "E-mails Entregues",
+          "description": "Quantidade de e-mails enviados com status de entrega confirmada.",
+          "formula": "emails_enviados - bounces",
+          "example": "12450",
+          "unit": "un",
+          "tags": [
+            "email",
+            "volume"
+          ],
+          "sort_order": 2
+        },
+        {
+          "field_id": "daily_increment",
+          "name": "Incremento Diario",
+          "description": "Variacao do total do dia atual em relacao ao dia anterior.",
+          "formula": "valor_dia_atual - valor_dia_anterior",
+          "example": "320",
+          "unit": "un",
+          "tags": [
+            "delta",
+            "tendencia"
+          ],
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "view_id": "facebook_google",
+      "title": "Facebook e Google",
+      "view_type": "mixed",
+      "sort_order": 2,
+      "status": "ativo",
+      "metric_owner": "Time BI",
+      "data_source": "Meta Ads + Google Ads",
+      "insights": [
+        {
+          "insight_id": "cost_per_conversion",
+          "title": "Custo por Conversao por canal",
+          "description": "Google mostrou menor custo por conversao medio, enquanto Meta sustentou maior volume.",
+          "notes": [
+            "Avaliar redistribuicao de verba",
+            "Separar por tipo de campanha"
+          ],
+          "tags": [
+            "m�dia paga",
+            "cpc",
+            "conversao"
+          ],
+          "sort_order": 1
+        },
+        {
+          "insight_id": "cpm_ctr_relation",
+          "title": "Relacao CPM x CTR",
+          "description": "Campanhas com CTR acima da mediana tendem a reduzir o CPM efetivo em audiencias similares.",
+          "notes": [
+            "Reforcar criativos vencedores",
+            "Revisar segmentacoes com CPM alto"
+          ],
+          "tags": [
+            "cpm",
+            "ctr",
+            "eficiencia"
+          ],
+          "sort_order": 2
+        }
+      ],
+      "glossary_fields": [
+        {
+          "field_id": "cost_per_conversion",
+          "name": "Custo por Conversao",
+          "description": "Custo medio para gerar uma conversao.",
+          "formula": "custo_total / conversoes",
+          "example": "37.52",
+          "unit": "R$",
+          "tags": [
+            "kpi",
+            "performance"
+          ],
+          "sort_order": 1
+        },
+        {
+          "field_id": "cpm",
+          "name": "CPM",
+          "description": "Custo para mil impressoes.",
+          "formula": "(custo_total / impressoes) * 1000",
+          "example": "22.40",
+          "unit": "R$",
+          "tags": [
+            "midia",
+            "alcance"
+          ],
+          "sort_order": 2
+        },
+        {
+          "field_id": "ctr",
+          "name": "CTR",
+          "description": "Taxa de clique sobre impressoes.",
+          "formula": "(cliques / impressoes) * 100",
+          "example": "1.93",
+          "unit": "%",
+          "tags": [
+            "engajamento",
+            "trafego"
+          ],
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "view_id": "instagram",
+      "title": "Instagram",
+      "view_type": "mixed",
+      "sort_order": 3,
+      "status": "ativo",
+      "metric_owner": "Time BI",
+      "data_source": "Meta Insights",
+      "insights": [
+        {
+          "insight_id": "engagement_top_posts",
+          "title": "Top posts por engajamento",
+          "description": "Posts com maior taxa de engajamento no periodo.",
+          "notes": [
+            "Comparar com periodo anterior",
+            "Separar por formato"
+          ],
+          "tags": [
+            "instagram",
+            "engajamento"
+          ],
+          "sort_order": 1
+        },
+        {
+          "insight_id": "format_performance",
+          "title": "Performance por formato de conteudo",
+          "description": "Reels lideram visualizacoes, enquanto carrosseis mantem melhor taxa de interacao.",
+          "notes": [
+            "Equilibrar calendario entre alcance e interacao",
+            "Replicar padrao dos top 10 posts"
+          ],
+          "tags": [
+            "reels",
+            "feed",
+            "story"
+          ],
+          "sort_order": 2
+        }
+      ],
+      "glossary_fields": [
+        {
+          "field_id": "engagement_rate",
+          "name": "% Engajamento",
+          "description": "Interacoes / Alcance * 100.",
+          "formula": "(interacoes / alcance) * 100",
+          "example": "4.3",
+          "unit": "%",
+          "tags": [
+            "kpi",
+            "instagram"
+          ],
+          "sort_order": 1
+        },
+        {
+          "field_id": "profile_visits",
+          "name": "Visitas ao Perfil",
+          "description": "Quantidade de acessos ao perfil no periodo.",
+          "formula": null,
+          "example": "1820",
+          "unit": "un",
+          "tags": [
+            "topo_funil",
+            "perfil"
+          ],
+          "sort_order": 2
+        },
+        {
+          "field_id": "follower_gain",
+          "name": "Seguidores Ganhos",
+          "description": "Novos seguidores liquidos no periodo.",
+          "formula": "seguidores_finais - seguidores_iniciais",
+          "example": "145",
+          "unit": "un",
+          "tags": [
+            "crescimento",
+            "instagram"
+          ],
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "view_id": "linkedin",
+      "title": "LinkedIn",
+      "view_type": "mixed",
+      "sort_order": 4,
+      "status": "ativo",
+      "metric_owner": "Time BI",
+      "data_source": "LinkedIn Analytics",
+      "insights": [
+        {
+          "insight_id": "reactions_trend",
+          "title": "Tendencia de reacoes",
+          "description": "A curva de reacoes cresce quando as postagens combinam tema tecnico e caso real.",
+          "notes": [
+            "Priorizar temas com prova social",
+            "Manter frequencia semanal"
+          ],
+          "tags": [
+            "linkedin",
+            "engajamento"
+          ],
+          "sort_order": 1
+        },
+        {
+          "insight_id": "top_posts_linkedin",
+          "title": "Top publicacoes",
+          "description": "Top 10 publicacoes concentram a maior parte dos cliques do periodo.",
+          "notes": [
+            "Reforcar CTA nos criativos",
+            "Ajustar texto de abertura"
+          ],
+          "tags": [
+            "top_posts",
+            "cliques"
+          ],
+          "sort_order": 2
+        }
+      ],
+      "glossary_fields": [
+        {
+          "field_id": "impressions",
+          "name": "Impressoes",
+          "description": "Numero total de vezes que o conteudo foi exibido.",
+          "formula": null,
+          "example": "54890",
+          "unit": "un",
+          "tags": [
+            "alcance",
+            "linkedin"
+          ],
+          "sort_order": 1
+        },
+        {
+          "field_id": "reactions",
+          "name": "Reacoes",
+          "description": "Interacoes de reacao nos posts (like, celebrate, etc.).",
+          "formula": null,
+          "example": "1390",
+          "unit": "un",
+          "tags": [
+            "engajamento",
+            "social"
+          ],
+          "sort_order": 2
+        },
+        {
+          "field_id": "click_rate",
+          "name": "Taxa de Clique",
+          "description": "Percentual de cliques sobre impressoes no LinkedIn.",
+          "formula": "(cliques / impressoes) * 100",
+          "example": "2.1",
+          "unit": "%",
+          "tags": [
+            "ctr",
+            "trafego"
+          ],
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "view_id": "youtube",
+      "title": "YouTube",
+      "view_type": "mixed",
+      "sort_order": 5,
+      "status": "ativo",
+      "metric_owner": "Time BI",
+      "data_source": "YouTube Studio",
+      "insights": [
+        {
+          "insight_id": "views_trend",
+          "title": "Tendencia de views",
+          "description": "Videos com thumbnail orientada a beneficio apresentaram pico de views no periodo.",
+          "notes": [
+            "Padronizar thumbnail com proposta clara",
+            "Acompanhar impacto por tema"
+          ],
+          "tags": [
+            "youtube",
+            "views",
+            "conteudo"
+          ],
+          "sort_order": 1
+        },
+        {
+          "insight_id": "duration_vs_retention",
+          "title": "Duracao media x duracao do video",
+          "description": "Conteudos entre 6 e 10 minutos mantiveram melhor retencao media.",
+          "notes": [
+            "Priorizar roteiros nessa faixa",
+            "Medir abandono por minuto"
+          ],
+          "tags": [
+            "retencao",
+            "watch_time"
+          ],
+          "sort_order": 2
+        }
+      ],
+      "glossary_fields": [
+        {
+          "field_id": "views",
+          "name": "Views",
+          "description": "Total de visualizacoes registradas para os videos.",
+          "formula": null,
+          "example": "32140",
+          "unit": "un",
+          "tags": [
+            "youtube",
+            "alcance"
+          ],
+          "sort_order": 1
+        },
+        {
+          "field_id": "impressions",
+          "name": "Impressoes",
+          "description": "Quantidade de exibicoes de miniaturas no YouTube.",
+          "formula": null,
+          "example": "412000",
+          "unit": "un",
+          "tags": [
+            "topo_funil",
+            "youtube"
+          ],
+          "sort_order": 2
+        },
+        {
+          "field_id": "avg_view_duration",
+          "name": "Duracao Media de Visualizacao",
+          "description": "Tempo medio assistido por view.",
+          "formula": "tempo_total_assistido / views",
+          "example": "00:03:42",
+          "unit": "tempo",
+          "tags": [
+            "retencao",
+            "qualidade"
+          ],
+          "sort_order": 3
+        }
+      ]
+    }
+  ]
+}
+

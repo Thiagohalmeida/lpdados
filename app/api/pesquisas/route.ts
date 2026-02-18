@@ -1,52 +1,70 @@
 // app/api/pesquisas/route.ts
 import { NextResponse } from 'next/server';
-import { BigQuery } from '@google-cloud/bigquery';
+import { getPesquisasFromBigQuery } from '@/lib/googleSheets';
+import type { Pesquisa } from '@/types/bi-platform';
 
-// Configura cliente BigQuery com credenciais e projectId
-const bigquery = new BigQuery({
-  projectId: process.env.PROJECT_ID || 'worlddata-439415',
-  credentials: process.env.GOOGLE_CREDENTIALS_JSON
-    ? JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
-    : undefined,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
-
-/**
- * GET /api/pesquisas
- * Retorna registros de pesquisas normalizados
- */
 export async function GET() {
   try {
-    const query = `
-      SELECT
-        titulo,
-        fonte,
-        link,
-        data,
-        conteudo,
-        tema
-      FROM \`worlddata-439415.lpdados.pesquisas\`
-      ORDER BY data DESC
-      LIMIT 100
-    `;
+    const data = await getPesquisasFromBigQuery();
 
-    const [rows] = await bigquery.query({ query });
+    const normalized = (data as any[]).map((item, i) => {
+      const extractValue = (val: any) => {
+        if (val && typeof val === 'object' && 'value' in val) return val.value;
+        return val;
+      };
 
-    // Normaliza objetos { value } para valores primitivos
-    const normalized = (rows as any[]).map((row) => {
       const out: Record<string, any> = {};
-      for (const key of Object.keys(row)) {
-        const val = (row as any)[key];
-        out[key] = val && typeof val === 'object' && 'value' in val ? val.value : val;
+      for (const key in item) {
+        out[key] = extractValue(item[key]);
       }
-      return out;
+
+      const titulo = out.titulo || out.Titulo || '';
+
+      return {
+        id: out.id || out.Id || String(i),
+        titulo,
+        fonte: out.fonte || out.Fonte || '',
+        link: out.link || out.Link || '',
+        data: out.data || out.Data || '',
+        conteudo: out.conteudo || out.Conteudo || '',
+        tema: out.tema || out.Tema || '',
+        // Campos de gestão
+        data_inicio: out.data_inicio || null,
+        ultima_atualizacao: out.ultima_atualizacao || null,
+        responsavel: out.responsavel || null,
+        cliente: out.cliente || null,
+        observacao: out.observacao || null
+      };
     });
 
-    return NextResponse.json(normalized);
+    const dedupedById = new Map<string, Pesquisa>();
+    let duplicateIds = 0;
+
+    for (const pesquisa of normalized as Pesquisa[]) {
+      const current = dedupedById.get(pesquisa.id);
+      if (!current) {
+        dedupedById.set(pesquisa.id, pesquisa);
+        continue;
+      }
+
+      duplicateIds += 1;
+      const currentTs = new Date(current.ultima_atualizacao || current.data || '').getTime();
+      const nextTs = new Date(pesquisa.ultima_atualizacao || pesquisa.data || '').getTime();
+
+      if (Number.isFinite(nextTs) && (!Number.isFinite(currentTs) || nextTs >= currentTs)) {
+        dedupedById.set(pesquisa.id, pesquisa);
+      }
+    }
+
+    if (duplicateIds > 0) {
+      console.warn(`GET /api/pesquisas deduplicou ${duplicateIds} registro(s) por id repetido.`);
+    }
+
+    return NextResponse.json(Array.from(dedupedById.values()));
   } catch (error) {
-    console.error('Erro ao consultar BigQuery:', error);
+    console.error('Erro ao buscar pesquisas:', error);
     return NextResponse.json(
-      { error: 'Erro interno ao buscar pesquisas' },
+      { error: 'Erro ao buscar pesquisas' },
       { status: 500 }
     );
   }

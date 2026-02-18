@@ -12,6 +12,10 @@ import {
   Filter,
   BookOpen,
   FolderKanban,
+  Grid3x3,
+  List,
+  ArrowUpDown,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,54 +23,87 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from "next/image"
+import Link from "next/link"
 import useSWR from "swr";
 import { CardItem } from "@/components/ui/CardItem";
 import ProjetoCard from "@/components/ui/ProjetoCard";
-import { useState } from "react";
+import ProjetoLista from "@/components/ui/ProjetoLista";
+import { useState, useEffect } from "react";
 import FerramentaCard from "@/components/ui/FerramentaCard";
+import { GlobalSearch } from "@/components/GlobalSearch";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { SkeletonCard, SkeletonCardSmall } from "@/components/ui/SkeletonCard";
+import type { Projeto, Dashboard, Documentacao, Ferramenta, Pesquisa } from "@/types/bi-platform";
 
 function normalizar(str: string) {
   return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 }
 
 export default function BIPortfolioPage() {
-  // SWR para cada aba
-  const { data: projetos, error: errorProjetos, isLoading: loadingProjetos } = useSWR(
-    "/api/projetos",
-    async (url: string) => (await fetch(url)).json()
+  // SWR usando API unificada /api/itens?tipo=X com revalidação
+  const { data: projetos, error: errorProjetos, isLoading: loadingProjetos, mutate: mutateProjetos } = useSWR<Projeto[]>(
+    "/api/itens?tipo=projeto",
+    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
+    { revalidateOnFocus: true, revalidateOnReconnect: true }
   );
-  const { data: dashboards, error: errorDash, isLoading: loadingDash } = useSWR(
-    "/api/dashboards",
-    async (url: string) => (await fetch(url)).json()
+  const { data: dashboards, error: errorDash, isLoading: loadingDash, mutate: mutateDash } = useSWR<Dashboard[]>(
+    "/api/itens?tipo=dashboard",
+    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
+    { revalidateOnFocus: true, revalidateOnReconnect: true }
   );
-  const { data: docs, error: errorDocs, isLoading: loadingDocs } = useSWR(
-    "/api/docs",
-    async (url: string) => (await fetch(url)).json()
+  const { data: docs, error: errorDocs, isLoading: loadingDocs, mutate: mutateDocs } = useSWR<Documentacao[]>(
+    "/api/itens?tipo=documentacao",
+    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
+    { revalidateOnFocus: true, revalidateOnReconnect: true }
   );
-  const { data: ferramentas, error: errorFerr, isLoading: loadingFerr } = useSWR(
-    "/api/ferramentas",
-    async (url: string) => (await fetch(url)).json()
+  const { data: ferramentas, error: errorFerr, isLoading: loadingFerr, mutate: mutateFerr } = useSWR<Ferramenta[]>(
+    "/api/itens?tipo=ferramenta",
+    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
+    { revalidateOnFocus: true, revalidateOnReconnect: true }
   );
-  const { data: pesquisas, error: errorPesquisas, isLoading: loadingPesquisas } = useSWR(
+  const { data: pesquisas, error: errorPesquisas, isLoading: loadingPesquisas, mutate: mutatePesquisas } = useSWR<Pesquisa[]>(
     "/api/pesquisas",
-    async (url: string) => (await fetch(url)).json()
+    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
+    { revalidateOnFocus: true, revalidateOnReconnect: true }
   );
 
   const [busca, setBusca] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState("todos");
+  const [statusFiltro, setStatusFiltro] = useState("em desenvolvimento"); // Filtro padrão: Em Desenvolvimento
   const [areaFiltro, setAreaFiltro] = useState("todas");
   const [areaFiltroDocs, setAreaFiltroDocs] = useState("todas");
   const [areaFiltroDash, setAreaFiltroDash] = useState("todas");
+  const [ordenacao, setOrdenacao] = useState<"recente" | "alfabetica">("recente");
+  const [visualizacao, setVisualizacao] = useState<"grid" | "lista">("grid");
+  const [visualizacaoDash, setVisualizacaoDash] = useState<"grid" | "tabela">("grid");
+  const [visualizacaoDocs, setVisualizacaoDocs] = useState<"grid" | "tabela">("grid");
 
-  // Filtragem dos projetos
-  const projetosFiltrados = projetos?.filter((item: any) => {
+  // Atalho de teclado Ctrl+Shift+A para Admin
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        window.location.href = '/admin';
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
+  // Filtragem dos projetos com tipos corretos
+  const projetosFiltrados = projetos?.filter((item: Projeto) => {
     const status = normalizar(item.status || "");
-    const nome = (item.nome || item.Nome || "").toLowerCase();
+    const nome = (item.nome || "").toLowerCase();
     const filtroStatus = normalizar(statusFiltro);
     return (
       (filtroStatus === "todos" || status === filtroStatus) &&
       nome.includes(busca.toLowerCase())
     );
+  }).sort((a, b) => {
+    if (ordenacao === "alfabetica") {
+      return a.nome.localeCompare(b.nome);
+    }
+    return 0; // recente (ordem original do BigQuery)
   });
 
   return (
@@ -101,10 +138,19 @@ export default function BIPortfolioPage() {
           </nav> */}
 
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm" className="border-purple-200 hover:bg-purple-50 bg-transparent text-blue-600">
-              <Search className="h-4 w-4 mr-2" />
-              Buscar
-            </Button>
+            <GlobalSearch />
+            
+            {/* Botão Admin */}
+            <Link href="/admin">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-purple-200 hover:bg-purple-50 bg-transparent text-blue-600"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -198,7 +244,7 @@ export default function BIPortfolioPage() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Projetos
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap items-center">
                   <Input
                     placeholder="Buscar projetos..."
                     value={busca}
@@ -208,35 +254,98 @@ export default function BIPortfolioPage() {
                   <select
                     value={statusFiltro}
                     onChange={e => setStatusFiltro(e.target.value)}
-                    className="border rounded-md px-2 py-1 text-sm text-gray-700"
+                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
                   >
-                    <option value="todos">Todos</option>
+                    <option value="todos">Todos Status</option>
                     <option value="entregue">Entregue</option>
                     <option value="em desenvolvimento">Em Desenvolvimento</option>
                     <option value="standby">Standby</option>
                   </select>
-                  <Button variant="outline" size="icon" className="border-purple-200 hover:bg-purple-50 bg-transparent">
-                    <Filter className="h-4 w-4 text-purple-600" />
-                  </Button>
+                  <select
+                    value={ordenacao}
+                    onChange={e => setOrdenacao(e.target.value as "recente" | "alfabetica")}
+                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
+                  >
+                    <option value="recente">Mais Recentes</option>
+                    <option value="alfabetica">A-Z</option>
+                  </select>
+                  <div className="flex border rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setVisualizacao("grid")}
+                      className={`px-3 py-2 ${visualizacao === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em grade"
+                    >
+                      <Grid3x3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setVisualizacao("lista")}
+                      className={`px-3 py-2 ${visualizacao === "lista" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em lista"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="px-6 py-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {projetosFiltrados?.map((item: any, i: number) => (
-                    <ProjetoCard
-                      key={i}
-                      nome={item.projeto || item.nome || item.Nome || item.titulo || item.Processo}
-                      descricao={item.descricao || item.Descricao || item.conteudo || ""}
-                      status={item.status || ""}
-                      data={item.data || item.Data || ""}
-                      link={item.link || item.Link}
-                      docs={item.docs || item.Docs}
-                      tecnologias={item.tecnologias || []}
-                      area={item.area || item.Area || ""}
-                    />
-                  ))}
-                </div>
+                {visualizacao === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {errorProjetos ? (
+                      <div className="col-span-full">
+                        <ErrorState 
+                          message="Erro ao carregar projetos. Tente novamente." 
+                          onRetry={() => mutateProjetos()}
+                        />
+                      </div>
+                    ) : loadingProjetos ? (
+                      [...Array(8)].map((_, i) => <SkeletonCard key={i} />)
+                    ) : (
+                      projetosFiltrados?.map((item: Projeto) => (
+                        <ProjetoCard
+                          key={item.id}
+                          id={item.id}
+                          nome={item.nome}
+                          descricao={item.descricao}
+                          status={item.status}
+                          data={item.data}
+                          link={item.link}
+                          docs={item.docs}
+                          tecnologias={item.tecnologias || []}
+                          area={item.area}
+                        />
+                      ))
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {errorProjetos ? (
+                      <ErrorState 
+                        message="Erro ao carregar projetos. Tente novamente." 
+                        onRetry={() => mutateProjetos()}
+                      />
+                    ) : loadingProjetos ? (
+                      [...Array(8)].map((_, i) => (
+                        <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-lg"></div>
+                      ))
+                    ) : (
+                      projetosFiltrados?.map((item: Projeto) => (
+                        <ProjetoLista
+                          key={item.id}
+                          id={item.id}
+                          nome={item.nome}
+                          descricao={item.descricao}
+                          status={item.status}
+                          data={item.data}
+                          link={item.link}
+                          docs={item.docs}
+                          tecnologias={item.tecnologias || []}
+                          area={item.area}
+                        />
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </TabsContent>
 
@@ -246,13 +355,13 @@ export default function BIPortfolioPage() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                   Dashboards
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <select
                     value={areaFiltroDash}
                     onChange={e => setAreaFiltroDash(e.target.value)}
-                    className="border rounded-md px-2 py-1 text-sm text-gray-700"
+                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
                   >
-                    <option value="todas">Todas</option>
+                    <option value="todas">Todas Áreas</option>
                     <option value="Tráfego">Tráfego</option>
                     <option value="Growth">Growth</option>
                     <option value="Financeiro">Financeiro</option>
@@ -260,39 +369,138 @@ export default function BIPortfolioPage() {
                     <option value="Comercial">Comercial</option>
                     <option value="Planejamento">Planejamento</option>
                   </select>
+                  <div className="flex border rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setVisualizacaoDash("grid")}
+                      className={`px-3 py-2 ${visualizacaoDash === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em grade"
+                    >
+                      <Grid3x3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setVisualizacaoDash("tabela")}
+                      className={`px-3 py-2 ${visualizacaoDash === "tabela" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em tabela"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
-                {errorDash ? (
-                  <div className="text-red-500">Erro ao carregar dashboards.</div>
-                ) : loadingDash ? (
-                  [...Array(6)].map((_, i) => (
-                    <div key={i} className="h-40 bg-zinc-100 animate-pulse rounded-2xl"></div>
-                  ))
-                ) : (
-                  dashboards
-                    ?.filter((item: any) =>
-                      areaFiltroDash === "todas" ||
-                      normalizar(item.Area || "") === normalizar(areaFiltroDash)
-                    )
-                    .map((item: any, i: number) => (
-                      <CardItem
-                        key={i}
-                        title={item.Nome}
-                        description={item.Descricao}
-                        link={item.Link}
-                        area={item.Area}
-                        icon={<BarChart3 className="w-5 h-5" />}
+              {visualizacaoDash === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
+                  {errorDash ? (
+                    <div className="col-span-full">
+                      <ErrorState 
+                        message="Erro ao carregar dashboards. Tente novamente." 
+                        onRetry={() => mutateDash()}
                       />
-                    ))
-                )}
-                {!loadingDash && dashboards?.filter((item: any) =>
-                  areaFiltroDash === "todas" ||
-                  normalizar(item.Area || "") === normalizar(areaFiltroDash)
-                ).length === 0 && (
-                  <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
-                )}
-              </div>
+                    </div>
+                  ) : loadingDash ? (
+                    [...Array(12)].map((_, i) => <SkeletonCardSmall key={i} />)
+                  ) : (
+                    (dashboards || [])
+                      ?.filter((item: Dashboard) =>
+                        areaFiltroDash === "todas" ||
+                        normalizar(item.area || "") === normalizar(areaFiltroDash)
+                      )
+                      .map((item: Dashboard) => (
+                        <CardItem
+                          key={item.id}
+                          id={item.id}
+                          title={item.nome}
+                          description={item.descricao}
+                          link={item.link}
+                          area={item.area}
+                          icon={<BarChart3 className="w-5 h-5" />}
+                          detailPath="/dashboards"
+                        />
+                      ))
+                  )}
+                  {!loadingDash && (dashboards || []).filter((item: Dashboard) =>
+                    areaFiltroDash === "todas" ||
+                    normalizar(item.area || "") === normalizar(areaFiltroDash)
+                  ).length === 0 && (
+                    <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg border overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Área</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {errorDash ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-12">
+                            <ErrorState 
+                              message="Erro ao carregar dashboards. Tente novamente." 
+                              onRetry={() => mutateDash()}
+                            />
+                          </td>
+                        </tr>
+                      ) : loadingDash ? (
+                        [...Array(6)].map((_, i) => (
+                          <tr key={i}>
+                            <td colSpan={4} className="px-6 py-4">
+                              <div className="h-6 bg-gray-100 animate-pulse rounded"></div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        (dashboards || [])
+                          ?.filter((item: Dashboard) =>
+                            areaFiltroDash === "todas" ||
+                            normalizar(item.area || "") === normalizar(areaFiltroDash)
+                          )
+                          .map((item: Dashboard) => {
+                            return (
+                              <tr key={item.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{item.descricao}</td>
+                                <td className="px-6 py-4">
+                                  <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold">
+                                    {item.area}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex gap-3">
+                                    <Link
+                                      href={`/dashboards/${item.id}`}
+                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
+                                    >
+                                      Detalhes
+                                    </Link>
+                                    <a
+                                      href={item.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
+                                    >
+                                      Acessar <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                      )}
+                    </tbody>
+                  </table>
+                  {!loadingDash && (dashboards || []).filter((item: Dashboard) =>
+                    areaFiltroDash === "todas" ||
+                    normalizar(item.area || "") === normalizar(areaFiltroDash)
+                  ).length === 0 && (
+                    <div className="text-center py-12 text-gray-500">Nenhum resultado encontrado.</div>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             {/* Documentação Tab */}
@@ -301,13 +509,13 @@ export default function BIPortfolioPage() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                   Documentação
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <select
                     value={areaFiltroDocs}
                     onChange={e => setAreaFiltroDocs(e.target.value)}
-                    className="border rounded-md px-2 py-1 text-sm text-gray-700"
+                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
                   >
-                    <option value="todas">Todas</option>
+                    <option value="todas">Todas Áreas</option>
                     <option value="Tráfego">Tráfego</option>
                     <option value="Growth">Growth</option>
                     <option value="Financeiro">Financeiro</option>
@@ -315,48 +523,153 @@ export default function BIPortfolioPage() {
                     <option value="Comercial">Comercial</option>
                     <option value="Planejamento">Planejamento</option>
                   </select>
+                  <div className="flex border rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setVisualizacaoDocs("grid")}
+                      className={`px-3 py-2 ${visualizacaoDocs === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em grade"
+                    >
+                      <Grid3x3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setVisualizacaoDocs("tabela")}
+                      className={`px-3 py-2 ${visualizacaoDocs === "tabela" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em tabela"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
-                {errorDocs ? (
-                  <div className="col-span-full text-red-500">Erro ao carregar documentação.</div>
-                ) : loadingDocs ? (
-                  [...Array(6)].map((_, i) => (
-                    <div key={i} className="h-40 bg-zinc-100 animate-pulse rounded-2xl"></div>
-                  ))
-                ) : (
-                  docs
-                    ?.filter((item: any) =>
-                      areaFiltroDocs === "todas" ||
-                      normalizar(item["Area"] || "") === normalizar(areaFiltroDocs)
-                    )
-                    .map((item: any, i: number) => (
-                      <div key={i} className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-5 flex flex-col justify-between h-full">
-                        <div className="mb-4">
-                          {item["Area"] && (
-                            <span className="inline-block bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium mb-2">{item["Area"]}</span>
-                          )}
-                          <h3 className="text-lg font-semibold text-blue-900 mb-2">{item.Processo}</h3>
-                          <p className="text-sm text-blue-700">{item.Descricao || ""}</p>
+              {visualizacaoDocs === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
+                  {errorDocs ? (
+                    <div className="col-span-full">
+                      <ErrorState 
+                        message="Erro ao carregar documentação. Tente novamente." 
+                        onRetry={() => mutateDocs()}
+                      />
+                    </div>
+                  ) : loadingDocs ? (
+                    [...Array(12)].map((_, i) => <SkeletonCardSmall key={i} />)
+                  ) : (
+                    (docs || [])
+                      ?.filter((item: Documentacao) =>
+                        areaFiltroDocs === "todas" ||
+                        normalizar(item.area || "") === normalizar(areaFiltroDocs)
+                      )
+                      .map((item: Documentacao) => (
+                        <div key={item.id} className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-5 flex flex-col justify-between h-full">
+                          <div className="mb-4">
+                            {item.area && (
+                              <span className="inline-block bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium mb-2">{item.area}</span>
+                            )}
+                            <h3 className="text-lg font-semibold text-blue-900 mb-2">{item.nome}</h3>
+                            <p className="text-sm text-blue-700">{item.descricao || ""}</p>
+                          </div>
+                          <div className="flex gap-3 flex-wrap">
+                            <Link
+                              href={`/docs/${item.id}`}
+                              className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
+                            >
+                              Detalhes
+                            </Link>
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
+                            >
+                              Acessar <FileText className="w-5 h-5" />
+                            </a>
+                          </div>
                         </div>
-                        <a
-                          href={item.Link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
-                        >
-                          Acessar <FileText className="w-5 h-5" />
-                        </a>
-                      </div>
-                    ))
-                )}
-                {!loadingDocs && docs?.filter((item: any) =>
-                  areaFiltroDocs === "todas" ||
-                  normalizar(item["Area"] || "") === normalizar(areaFiltroDocs)
-                ).length === 0 && (
-                  <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
-                )}
-              </div>
+                      ))
+                  )}
+                  {!loadingDocs && (docs || []).filter((item: Documentacao) =>
+                    areaFiltroDocs === "todas" ||
+                    normalizar(item.area || "") === normalizar(areaFiltroDocs)
+                  ).length === 0 && (
+                    <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg border overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Processo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Área</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {errorDocs ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-12">
+                            <ErrorState 
+                              message="Erro ao carregar documentação. Tente novamente." 
+                              onRetry={() => mutateDocs()}
+                            />
+                          </td>
+                        </tr>
+                      ) : loadingDocs ? (
+                        [...Array(6)].map((_, i) => (
+                          <tr key={i}>
+                            <td colSpan={4} className="px-6 py-4">
+                              <div className="h-6 bg-gray-100 animate-pulse rounded"></div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        (docs || [])
+                          ?.filter((item: Documentacao) =>
+                            areaFiltroDocs === "todas" ||
+                            normalizar(item.area || "") === normalizar(areaFiltroDocs)
+                          )
+                          .map((item: Documentacao) => {
+                            return (
+                              <tr key={item.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{item.descricao}</td>
+                                <td className="px-6 py-4">
+                                  <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold">
+                                    {item.area}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex gap-3">
+                                    <Link
+                                      href={`/docs/${item.id}`}
+                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
+                                    >
+                                      Detalhes
+                                    </Link>
+                                    <a
+                                      href={item.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
+                                    >
+                                      Acessar <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                      )}
+                    </tbody>
+                  </table>
+                  {!loadingDocs && (docs || []).filter((item: Documentacao) =>
+                    areaFiltroDocs === "todas" ||
+                    normalizar(item.area || "") === normalizar(areaFiltroDocs)
+                  ).length === 0 && (
+                    <div className="text-center py-12 text-gray-500">Nenhum resultado encontrado.</div>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             {/* Ferramentas Tab */}
@@ -370,19 +683,23 @@ export default function BIPortfolioPage() {
                 </p>
               </div>
               {errorFerr ? (
-                <div className="text-red-500">Erro ao carregar ferramentas.</div>
+                <ErrorState 
+                  message="Erro ao carregar ferramentas. Tente novamente." 
+                  onRetry={() => mutateFerr()}
+                />
               ) : loadingFerr ? (
                 [...Array(3)].map((_, i) => (
                   <div key={i} className="h-32 bg-zinc-100 animate-pulse rounded-2xl mb-4"></div>
                 ))
               ) : (
-                ferramentas?.map((item: any, i: number) => (
+                ferramentas?.map((item: Ferramenta) => (
                   <FerramentaCard
-                    key={i}
-                    nome={item.Nome}
-                    descricao={item.Descricao}
-                    link={item.Link}
-                    proxAtualizacao={item.ProxAtualizacao}
+                    key={item.id}
+                    id={item.id}
+                    nome={item.nome}
+                    descricao={item.descricao}
+                    link={item.link}
+                    proxAtualizacao={item.proxima_atualizacao}
                   />
                 ))
               )}
@@ -409,39 +726,49 @@ export default function BIPortfolioPage() {
               </div>
               <div className="grid grid-cols-1 gap-6">
                 {errorPesquisas ? (
-                  <div className="col-span-full text-red-500">Erro ao carregar pesquisas.</div>
+                  <ErrorState 
+                    message="Erro ao carregar pesquisas. Tente novamente." 
+                    onRetry={() => mutatePesquisas()}
+                  />
                 ) : loadingPesquisas ? (
                   [...Array(6)].map((_, i) => (
                     <div key={i} className="h-40 bg-zinc-100 animate-pulse rounded-2xl"></div>
                   ))
                 ) : (
                   (pesquisas || [])
-                    .filter((item: any) => areaFiltro === "todas" || item.tema === areaFiltro)
-                    .map((item: any, i: number) => (
-                      <div key={i} className="bg-white rounded-xl shadow-md border-l-4 border-l-blue-400 hover:shadow-lg transition-all duration-300 p-6 flex flex-col gap-2">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
-                          <span className="inline-block px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold mb-1 md:mb-0">{item.tema}</span>
-                          <span className="text-xs text-gray-500">{item.data}</span>
+                    .filter((item: Pesquisa) => areaFiltro === "todas" || item.tema === areaFiltro)
+                    .map((item: Pesquisa) => {
+                      return (
+                        <div key={item.id} className="bg-white rounded-xl shadow-md border-l-4 border-l-blue-400 hover:shadow-lg transition-all duration-300 p-6 flex flex-col gap-2">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                            <span className="inline-block px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold mb-1 md:mb-0">{item.tema}</span>
+                            <span className="text-xs text-gray-500">{item.data}</span>
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.titulo}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                              <BookOpen className="w-5 h-5" />
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-600 mb-1"><span className="font-semibold">Fonte:</span> {item.fonte}</div>
+                          <div className="text-sm text-gray-700 whitespace-pre-line mb-2 line-clamp-3">{item.conteudo}</div>
+                          <div className="flex gap-3 flex-wrap">
+                            <Link href={`/pesquisas/${item.id}`} className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium text-sm">
+                              Ver Detalhes
+                            </Link>
+                            {item.link ? (
+                              <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium text-sm">
+                                Acessar pesquisa
+                              </a>
+                            ) : (
+                              <span className="text-sm text-gray-400">Link indisponível</span>
+                            )}
+                          </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.Titulo}</h3>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                            <BookOpen className="w-5 h-5" />
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-600 mb-1"><span className="font-semibold">Fonte:</span> {item.fonte}</div>
-                        <div className="text-sm text-gray-700 whitespace-pre-line mb-2">{item.conteudo}</div>
-                        {item.link ? (
-                          <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium text-sm">
-                            Acessar pesquisa
-                          </a>
-                        ) : (
-                          <span className="text-sm text-gray-400">Link indisponível</span>
-                        )}
-                      </div>
-                    ))
+                      );
+                    })
                 )}
-                {!loadingPesquisas && (pesquisas || []).filter((item: any) => areaFiltro === "todas" || item.tema === areaFiltro).length === 0 && (
+                {!loadingPesquisas && (pesquisas || []).filter((item: Pesquisa) => areaFiltro === "todas" || item.tema === areaFiltro).length === 0 && (
                   <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
                 )}
               </div>

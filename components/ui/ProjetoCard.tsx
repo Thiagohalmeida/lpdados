@@ -1,11 +1,13 @@
-import { ExternalLink, Download } from "lucide-react";
+import { ExternalLink, Download, Info } from "lucide-react";
+import Link from "next/link";
 
 interface ProjetoCardProps {
+  id?: string;
   nome: string;
   descricao: string;
   status: string;
   data?: string;
-  link: string;
+  link?: string;
   docs?: string;
   tecnologias?: string[];
   area?: string;
@@ -17,7 +19,10 @@ const STATUS_COLORS: Record<string, string> = {
   "Standby": "bg-purple-100 text-purple-800 border-purple-200",
 };
 
-export default function ProjetoCard({ nome, descricao, status, data, link, docs, tecnologias = [], area }: ProjetoCardProps) {
+export default function ProjetoCard({ id, nome, descricao, status, data, link, docs, tecnologias = [], area }: ProjetoCardProps) {
+  // Gerar ID baseado no nome se não tiver ID
+  const projetoId = id || nome.toLowerCase().replace(/\s+/g, '-');
+  
   return (
     <div className="rounded-2xl border bg-white shadow-md p-6 flex flex-col justify-between h-full transition-all hover:shadow-lg border-l-4 border-l-blue-400 hover:border-l-blue-500">
       <div>
@@ -34,25 +39,37 @@ export default function ProjetoCard({ nome, descricao, status, data, link, docs,
           ))}
         </div>
       </div>
-      <div className="flex gap-2 mt-2">
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition"
+      <div className="flex flex-col gap-2 mt-2">
+        {/* Botão Detalhes */}
+        <Link
+          href={`/projetos/${projetoId}`}
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition"
         >
-          <ExternalLink className="h-4 w-4" /> Visualizar
-        </a>
-        {docs && (
-          <a
-            href={docs}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 transition"
-          >
-            <Download className="h-4 w-4" /> Docs
-          </a>
-        )}
+          <Info className="h-4 w-4" /> Detalhes
+        </Link>
+        
+        <div className="flex gap-2">
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition"
+            >
+              <ExternalLink className="h-4 w-4" /> Acessar
+            </a>
+          )}
+          {docs && (
+            <a
+              href={docs}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 transition"
+            >
+              <Download className="h-4 w-4" /> Docs
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

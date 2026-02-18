@@ -3,26 +3,30 @@ import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 interface CardItemProps {
+  id?: string;
   title: string;
   description?: string;
   area?: string;
   link: string;
-  borderColor?: string; // Ex: "border-l-blue-500"
+  borderColor?: string;
   icon?: React.ReactNode;
+  detailPath?: string; // e.g., "/dashboards" or "/docs"
 }
 
 export function CardItem({
+  id,
   title,
   description,
   area,
   link,
   borderColor = "border-l-blue-500",
   icon,
+  detailPath,
 }: CardItemProps) {
   return (
     <div className={`bg-white rounded-xl shadow-md border-l-4 border-l-blue-400 hover:shadow-lg transition-all duration-300 flex flex-col h-full`}>
       <div className="p-4 flex-1 flex flex-col">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
           {icon && (
             <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500">
               {icon}
@@ -37,7 +41,12 @@ export function CardItem({
           <p className="text-sm text-gray-600 flex-1 mb-4">{description}</p>
         )}
       </div>
-      <div className="flex justify-end p-4 pt-0">
+      <div className="flex justify-between items-center p-4 pt-0 gap-2">
+        {detailPath && id && (
+          <Link href={`${detailPath}/${id}`} className="text-sm font-medium text-blue-600 flex items-center gap-1 hover:underline">
+            Detalhes
+          </Link>
+        )}
         {link ? (
           <Link href={link} target="_blank" className="text-sm font-medium text-blue-600 flex items-center gap-1 hover:underline">
             Acessar <ExternalLink size={16} />

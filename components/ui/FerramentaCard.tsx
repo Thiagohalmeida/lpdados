@@ -1,6 +1,8 @@
-import { ExternalLink, BarChart3, Database, FileText, TrendingUp } from "lucide-react";
+import { ExternalLink, BarChart3, Database, FileText, TrendingUp, Info } from "lucide-react";
+import Link from "next/link";
 
 interface FerramentaCardProps {
+  id?: string;
   nome: string;
   descricao: string;
   link: string;
@@ -27,12 +29,15 @@ const CARD_STYLES: Record<string, { color: string; icon: React.ReactNode; button
   // Adicione mais conforme necessário
 };
 
-export default function FerramentaCard({ nome, descricao, link, proxAtualizacao }: FerramentaCardProps) {
+export default function FerramentaCard({ id, nome, descricao, link, proxAtualizacao }: FerramentaCardProps) {
   const style = CARD_STYLES[nome] || {
     color: "border-l-4 border-l-blue-400",
     icon: <FileText className="h-8 w-8 text-blue-600" />,
     button: "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
   };
+  
+  // Usar ID se disponível, fallback para nome normalizado
+  const detailsId = id || nome.toLowerCase().replace(/\s+/g, '-');
 
   return (
     <div className={`flex flex-col md:flex-row items-center bg-white rounded-2xl shadow-md border p-6 gap-4 mb-4 ${style.color}`}>
@@ -40,7 +45,6 @@ export default function FerramentaCard({ nome, descricao, link, proxAtualizacao 
         <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-2 bg-gradient-to-r from-blue-100 to-purple-100">
           {style.icon}
         </div>
-        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Ativo</span>
       </div>
       <div className="flex-1 w-full">
         <div className="flex items-center justify-between mb-2">
@@ -52,14 +56,22 @@ export default function FerramentaCard({ nome, descricao, link, proxAtualizacao 
           )}
         </div>
         <p className="text-sm text-zinc-700 mb-4">{descricao}</p>
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl text-white ${style.button} transition`}
-        >
-          Acessar <ExternalLink size={16} />
-        </a>
+        <div className="flex gap-3 flex-wrap">
+          <Link
+            href={`/ferramentas/${detailsId}`}
+            className="inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 transition"
+          >
+            <Info size={16} /> Ver Detalhes
+          </Link>
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-xl text-white ${style.button} transition`}
+          >
+            Acessar <ExternalLink size={16} />
+          </a>
+        </div>
       </div>
     </div>
   );
