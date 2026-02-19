@@ -76,6 +76,7 @@ export default function BIPortfolioPage() {
   const [visualizacao, setVisualizacao] = useState<"grid" | "lista">("grid");
   const [visualizacaoDash, setVisualizacaoDash] = useState<"grid" | "tabela">("grid");
   const [visualizacaoDocs, setVisualizacaoDocs] = useState<"grid" | "tabela">("grid");
+  const [visualizacaoPesquisas, setVisualizacaoPesquisas] = useState<"grid" | "lista">("lista");
 
   // Atalho de teclado Ctrl+Shift+A para Admin
   useEffect(() => {
@@ -115,9 +116,9 @@ export default function BIPortfolioPage() {
             <Image src="/images/f5-logo.png" alt="Control F5 Logo" width={120} height={32} className="h-8 w-auto" />
             <div className="border-l border-blue-200 pl-4">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                BI & Analytics
+                Business intelligence
               </h1>
-              <p className="text-xs text-blue-400">Business Intelligence Hub</p>
+              <p className="text-xs text-blue-400">Planejamento e Estratégia</p>
             </div>
           </div>
 
@@ -711,20 +712,36 @@ export default function BIPortfolioPage() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                   Pesquisas
                 </h2>
-                <div className="flex gap-2 w-full max-w-xs">
+                <div className="flex gap-2 w-full sm:w-auto items-center">
                   <select
                     value={areaFiltro}
                     onChange={e => setAreaFiltro(e.target.value)}
-                    className="border rounded-md px-2 py-1 text-sm text-gray-700 w-full"
+                    className="border rounded-md px-2 py-1 text-sm text-gray-700 w-full sm:w-64"
                   >
                     <option value="todas">Todos os Temas</option>
                     {Array.from(new Set((pesquisas || []).map((p: any) => String(p.tema)).filter(Boolean))).map((tema, i) => (
                       <option key={i} value={String(tema)}>{String(tema)}</option>
                     ))}
                   </select>
+                  <div className="flex border rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setVisualizacaoPesquisas("grid")}
+                      className={`px-3 py-2 ${visualizacaoPesquisas === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em grade"
+                    >
+                      <Grid3x3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setVisualizacaoPesquisas("lista")}
+                      className={`px-3 py-2 ${visualizacaoPesquisas === "lista" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                      title="Visualização em lista"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-6">
+              <div className={visualizacaoPesquisas === "lista" ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"}>
                 {errorPesquisas ? (
                   <ErrorState 
                     message="Erro ao carregar pesquisas. Tente novamente." 
@@ -791,9 +808,9 @@ export default function BIPortfolioPage() {
               />
               <div className="border-l border-blue-200 pl-4">
                 <div className="font-bold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
-                  BI & Analytics Hub
+                  Business intelligence
                 </div>
-                <div className="text-sm text-blue-300">Business Intelligence</div>
+                <div className="text-sm text-blue-300">Planejamento e Estratégia</div>
               </div>
             </div>
 
