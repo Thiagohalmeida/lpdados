@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 function shouldTrack(pathname: string) {
   const path = (pathname || '').toLowerCase();
@@ -22,13 +22,15 @@ function shouldTrack(pathname: string) {
 
 export function TelemetryTracker() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const lastTrackedKey = useRef<string>('');
 
   useEffect(() => {
     if (!pathname || !shouldTrack(pathname)) return;
 
-    const queryString = searchParams?.toString() || '';
+    const queryString =
+      typeof window !== 'undefined' && window.location.search
+        ? window.location.search.replace(/^\?/, '')
+        : '';
     const currentKey = queryString ? `${pathname}?${queryString}` : pathname;
 
     if (lastTrackedKey.current === currentKey) return;
@@ -52,7 +54,7 @@ export function TelemetryTracker() {
     }).catch(() => {
       // No-op to avoid UI noise if telemetry is unavailable.
     });
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return null;
 }
