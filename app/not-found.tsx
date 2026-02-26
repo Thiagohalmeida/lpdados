@@ -15,11 +15,11 @@ export default function NotFound() {
           <Button asChild variant="outline">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar
+              Ir para Início
             </Link>
           </Button>
           <Button asChild>
-            <Link href="/">
+            <Link href="/portal">
               <Home className="mr-2 h-4 w-4" />
               Ir para o Portal
             </Link>

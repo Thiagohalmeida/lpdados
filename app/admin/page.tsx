@@ -1,16 +1,18 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { getServerSession } from 'next-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FolderKanban, BookOpen, Home, FileJson } from 'lucide-react';
 import { LogoutButton } from '@/components/LogoutButton';
+import { authOptions, isAdminEmail } from '@/lib/auth-options';
 
 export default async function AdminPage() {
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get('admin_auth')?.value === 'true';
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email?.toLowerCase();
+  const isAuthenticated = !!email && isAdminEmail(email);
 
   if (!isAuthenticated) {
-    redirect('/admin/login');
+    redirect('/api/auth/signin?callbackUrl=/admin');
   }
 
   const sections = [
@@ -47,7 +49,7 @@ export default async function AdminPage() {
           <div className="flex items-center gap-6">
             <h1 className="text-xl font-bold text-gray-900">Painel Admin</h1>
             <div className="flex gap-4">
-              <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
+              <Link href="/portal" className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
                 <Home className="h-4 w-4" />
                 Ver Site
               </Link>

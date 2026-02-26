@@ -1,837 +1,303 @@
-"use client";
-
+import Link from "next/link";
+import Image from "next/image";
 import {
+  ArrowDown,
+  ArrowRight,
   BarChart3,
+  ChartNoAxesCombined,
   Database,
-  FileText,
-  TrendingUp,
-  Calendar,
-  ExternalLink,
-  Download,
-  Search,
   Filter,
-  BookOpen,
-  FolderKanban,
-  Grid3x3,
-  List,
-  ArrowUpDown,
-  Settings,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Image from "next/image"
-import Link from "next/link"
-import useSWR from "swr";
-import { CardItem } from "@/components/ui/CardItem";
-import ProjetoCard from "@/components/ui/ProjetoCard";
-import ProjetoLista from "@/components/ui/ProjetoLista";
-import { useState, useEffect } from "react";
-import FerramentaCard from "@/components/ui/FerramentaCard";
-import { GlobalSearch } from "@/components/GlobalSearch";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { SkeletonCard, SkeletonCardSmall } from "@/components/ui/SkeletonCard";
-import type { Projeto, Dashboard, Documentacao, Ferramenta, Pesquisa } from "@/types/bi-platform";
+  Files,
+  Rocket,
+  ShieldCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-function normalizar(str: string) {
-  return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-}
+const destaques = [
+  {
+    titulo: "Nossa miss\u00e3o",
+    descricao: "Apoiar todas as \u00e1reas para decis\u00f5es estrat\u00e9gicas guiadas por dados, an\u00e1lises e insights extra\u00eddos de informa\u00e7\u00f5es concretas.",
+    icone: ChartNoAxesCombined,
+  },
+  {
+    titulo: "Fontes de dados",
+    descricao: "Coletarmos dados de m\u00eddias sociais, ADS, SEO, CRM e streamming de informa\u00e7\u00f5es relevantes para nossas decis\u00f5es.",
+    icone: Database,
+  },
+  {
+    titulo: "Cloud",
+    descricao: "Temos um armazenamento centralizado para os dados de diferentes fontes, como CRM, redes sociais e sites. Dessa forma, temos hist\u00f3rico detalhado em um formato estruturado, permitindo an\u00e1lises aprofundadas de tend\u00eancias e padr\u00f5es.",
+    icone: ShieldCheck,
+  },
+];
 
-export default function BIPortfolioPage() {
-  // SWR usando API unificada /api/itens?tipo=X com revalidação
-  const { data: projetos, error: errorProjetos, isLoading: loadingProjetos, mutate: mutateProjetos } = useSWR<Projeto[]>(
-    "/api/itens?tipo=projeto",
-    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
-  );
-  const { data: dashboards, error: errorDash, isLoading: loadingDash, mutate: mutateDash } = useSWR<Dashboard[]>(
-    "/api/itens?tipo=dashboard",
-    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
-  );
-  const { data: docs, error: errorDocs, isLoading: loadingDocs, mutate: mutateDocs } = useSWR<Documentacao[]>(
-    "/api/itens?tipo=documentacao",
-    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
-  );
-  const { data: ferramentas, error: errorFerr, isLoading: loadingFerr, mutate: mutateFerr } = useSWR<Ferramenta[]>(
-    "/api/itens?tipo=ferramenta",
-    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
-  );
-  const { data: pesquisas, error: errorPesquisas, isLoading: loadingPesquisas, mutate: mutatePesquisas } = useSWR<Pesquisa[]>(
-    "/api/pesquisas",
-    async (url: string) => (await fetch(url, { cache: 'no-store' })).json(),
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
-  );
+const pipelineBenefits = ["Eficiência", "Qualidade", "Agilidade", "Escalabilidade"];
 
-  const [busca, setBusca] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState("em desenvolvimento"); // Filtro padrão: Em Desenvolvimento
-  const [areaFiltro, setAreaFiltro] = useState("todas");
-  const [areaFiltroDocs, setAreaFiltroDocs] = useState("todas");
-  const [areaFiltroDash, setAreaFiltroDash] = useState("todas");
-  const [ordenacao, setOrdenacao] = useState<"recente" | "alfabetica">("recente");
-  const [visualizacao, setVisualizacao] = useState<"grid" | "lista">("grid");
-  const [visualizacaoDash, setVisualizacaoDash] = useState<"grid" | "tabela">("grid");
-  const [visualizacaoDocs, setVisualizacaoDocs] = useState<"grid" | "tabela">("grid");
-  const [visualizacaoPesquisas, setVisualizacaoPesquisas] = useState<"grid" | "lista">("lista");
+const pipelineStages = [
+  {
+    titulo: "Fontes de dados",
+    descricao: "Redes sociais, ADS, SEO, CRM e sites.",
+    icone: Files,
+  },
+  {
+    titulo: "ETL",
+    descricao: "Coleta, limpeza e padronizacao dos dados.",
+    icone: Filter,
+  },
+  {
+    titulo: "Armazenamento",
+    descricao: "Dados estruturados em base centralizada.",
+    icone: Database,
+  },
+  {
+    titulo: "Analise",
+    descricao: "Modelagem, visoes e insights acionaveis.",
+    icone: BarChart3,
+  },
+  {
+    titulo: "Uso",
+    descricao: "Decisoes estrategicas com suporte analitico.",
+    icone: Rocket,
+  },
+];
 
-  // Atalho de teclado Ctrl+Shift+A para Admin
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        window.location.href = '/admin';
-      }
-    };
-    
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, []);
+const dataDrivenImpacts = [
+  {
+    numero: "01",
+    titulo: "Decisões mais assertivas",
+    descricao:
+      "Decisões com base em dados concretos, reduzindo a subjetividade e aumentando a precisão nas escolhas estratégicas.",
+  },
+  {
+    numero: "02",
+    titulo: "Identificação de oportunidades",
+    descricao:
+      "Dados organizados e acessíveis permitem detectar padrões, comportamento de clientes e áreas de melhoria, gerando insights para inovações ou novos negócios.",
+  },
+  {
+    numero: "03",
+    titulo: "Otimização de processos",
+    descricao:
+      "Permite identificar gargalos e ineficiências operacionais, levando à automação e à melhoria contínua dos processos internos.",
+  },
+  {
+    numero: "04",
+    titulo: "Experiência do cliente",
+    descricao:
+      "Melhora a experiência do cliente e impulsiona o crescimento ao entender melhor o comportamento.",
+  },
+  {
+    numero: "05",
+    titulo: "Eficiência da performance financeira",
+    descricao:
+      "Reduz custos e maximiza o retorno sobre investimentos ao priorizar ações com maior potencial de sucesso.",
+  },
+];
 
-  // Filtragem dos projetos com tipos corretos
-  const projetosFiltrados = projetos?.filter((item: Projeto) => {
-    const status = normalizar(item.status || "");
-    const nome = (item.nome || "").toLowerCase();
-    const filtroStatus = normalizar(statusFiltro);
-    return (
-      (filtroStatus === "todos" || status === filtroStatus) &&
-      nome.includes(busca.toLowerCase())
-    );
-  }).sort((a, b) => {
-    if (ordenacao === "alfabetica") {
-      return a.nome.localeCompare(b.nome);
-    }
-    return 0; // recente (ordem original do BigQuery)
-  });
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-blue-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center space-x-4">
-            <Image src="/images/f5-logo.png" alt="Control F5 Logo" width={120} height={32} className="h-8 w-auto" />
-            <div className="border-l border-blue-200 pl-4">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Business intelligence
-              </h1>
-              <p className="text-xs text-blue-400">Planejamento e Estratégia</p>
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#1d4ed8_0%,#1e3a8a_45%,#0f172a_100%)] text-white">
+        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(120deg,transparent_0%,#ffffff_30%,transparent_60%)]" />
+        <div className="container mx-auto px-4 py-20 relative z-10">
+          <div className="max-w-4xl">
+            <div className="mt-8 flex items-center gap-4">
+              <Image src="/images/f5-logo.png" alt="Control F5 Logo" width={120} height={32} className="h-8 w-auto" />
+              <span className="text-blue-100 text-sm">Business Intelligence | Planejamento e Estrategia</span>
             </div>
-          </div>
 
-          {/* Remover menu de navegação do header */}
-          {/* <nav className="hidden md:flex items-center space-x-6">
-            <a href="/projetos" className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
-              Projetos
-            </a>
-            <a href="/documentacao" className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
-              Documentação
-            </a>
-            <a href="/dashboards" className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
-              Dashboards
-            </a>
-            <a href="/ferramentas" className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
-              Ferramentas
-            </a>
-          </nav> */}
-
-          <div className="flex items-center space-x-3">
-            <GlobalSearch />
-            
-            {/* Botão Admin */}
-            <Link href="/admin">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-purple-200 hover:bg-purple-50 bg-transparent text-blue-600"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Admin
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative overflow-hidden">
-        <div className="absolute inset-0 bg-white/10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl text-white">
-            {/* Remover badge */}
-            {/* <Badge className="mb-4 bg-white/20 text-white border-white/30 hover:bg-white/25">
-              📊 Área de Business Intelligence
-            </Badge> */}
-
-            <h1 className="text-4xl font-bold mb-4">Projetos e Soluções de BI</h1>
-
-            <p className="text-lg text-blue-100 mb-8 max-w-2xl">
-              Centralizamos projetos, documentações, dashboards, pesquisas e ferramentas que impulsionam nossa cultura de dados e apoiam a tomada de decisões estratégicas.
+            <h1 className="mt-6 text-4xl md:text-6xl font-bold leading-tight">
+              Portal Bussines Intelligence
+            </h1>
+            <p className="mt-6 text-lg md:text-xl text-blue-100 max-w-3xl">
+              Bem-vindo ao seu hub de dados! Este portal centraliza nossas ferramentas, dashboards e projetos de BI em um so lugar.
+              Descubra como nossa area esta estruturada, entenda nossos fluxos e acesse materiais de apoio criados para impulsionar a cultura data-driven no seu time.
+              Conecte-se, analise e decida com confianca.
             </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-400">{projetos ? projetos.length : 0}</div>
-                <div className="text-sm text-blue-100">Projetos</div>
-              </div>
-              <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-400">{dashboards ? dashboards.length : 0}</div>
-                <div className="text-sm text-blue-100">Dashboards</div>
-              </div>
-              <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-400">{docs ? docs.length : 0}</div>
-                <div className="text-sm text-blue-100">Documentação</div>
-              </div>
-              <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-400">{ferramentas ? ferramentas.length : 0}</div>
-                <div className="text-sm text-blue-100">Ferramentas</div>
-              </div>
-              <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-400">{pesquisas ? pesquisas.length : 0}</div>
-                <div className="text-sm text-blue-100">Pesquisas</div>
-              </div>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link href="/portal">
+                <Button className="bg-white text-blue-700 hover:bg-blue-50 font-semibold">
+                  Entrar no Portal
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/central-ajuda">
+                <Button variant="outline" className="border-white/40 text-white hover:bg-white/10 bg-transparent">
+                  Ver Central de Ajuda
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10">
+                  Area administrativa
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-200/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl"></div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <Tabs defaultValue="projetos" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-8 bg-gradient-to-r from-blue-50 to-purple-50">
-              <TabsTrigger
-                value="projetos"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Projetos
-              </TabsTrigger>
-              <TabsTrigger
-                value="dashboards"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Dashboards
-              </TabsTrigger>
-              <TabsTrigger
-                value="documentacao"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Documentação
-              </TabsTrigger>
-              <TabsTrigger
-                value="ferramentas"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Ferramentas
-              </TabsTrigger>
-              <TabsTrigger
-                value="pesquisas"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Pesquisas
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Projetos Tab */}
-            <TabsContent value="projetos" id="projetos">
-              <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Projetos
-                </h2>
-                <div className="flex gap-2 flex-wrap items-center">
-                  <Input
-                    placeholder="Buscar projetos..."
-                    value={busca}
-                    onChange={e => setBusca(e.target.value)}
-                    className="w-64 border-purple-200 focus:border-purple-400"
-                  />
-                  <select
-                    value={statusFiltro}
-                    onChange={e => setStatusFiltro(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
-                  >
-                    <option value="todos">Todos Status</option>
-                    <option value="entregue">Entregue</option>
-                    <option value="em desenvolvimento">Em Desenvolvimento</option>
-                    <option value="standby">Standby</option>
-                  </select>
-                  <select
-                    value={ordenacao}
-                    onChange={e => setOrdenacao(e.target.value as "recente" | "alfabetica")}
-                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
-                  >
-                    <option value="recente">Mais Recentes</option>
-                    <option value="alfabetica">A-Z</option>
-                  </select>
-                  <div className="flex border rounded-md overflow-hidden">
-                    <button
-                      onClick={() => setVisualizacao("grid")}
-                      className={`px-3 py-2 ${visualizacao === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em grade"
-                    >
-                      <Grid3x3 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setVisualizacao("lista")}
-                      className={`px-3 py-2 ${visualizacao === "lista" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em lista"
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-6 py-12">
-                {visualizacao === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {errorProjetos ? (
-                      <div className="col-span-full">
-                        <ErrorState 
-                          message="Erro ao carregar projetos. Tente novamente." 
-                          onRetry={() => mutateProjetos()}
-                        />
-                      </div>
-                    ) : loadingProjetos ? (
-                      [...Array(8)].map((_, i) => <SkeletonCard key={i} />)
-                    ) : (
-                      projetosFiltrados?.map((item: Projeto) => (
-                        <ProjetoCard
-                          key={item.id}
-                          id={item.id}
-                          nome={item.nome}
-                          descricao={item.descricao}
-                          status={item.status}
-                          data={item.data}
-                          link={item.link}
-                          docs={item.docs}
-                          tecnologias={item.tecnologias || []}
-                          area={item.area}
-                        />
-                      ))
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {errorProjetos ? (
-                      <ErrorState 
-                        message="Erro ao carregar projetos. Tente novamente." 
-                        onRetry={() => mutateProjetos()}
-                      />
-                    ) : loadingProjetos ? (
-                      [...Array(8)].map((_, i) => (
-                        <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-lg"></div>
-                      ))
-                    ) : (
-                      projetosFiltrados?.map((item: Projeto) => (
-                        <ProjetoLista
-                          key={item.id}
-                          id={item.id}
-                          nome={item.nome}
-                          descricao={item.descricao}
-                          status={item.status}
-                          data={item.data}
-                          link={item.link}
-                          docs={item.docs}
-                          tecnologias={item.tecnologias || []}
-                          area={item.area}
-                        />
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            {/* Dashboards Tab */}
-            <TabsContent value="dashboards" id="dashboards">
-              <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  Dashboards
-                </h2>
-                <div className="flex gap-2 items-center">
-                  <select
-                    value={areaFiltroDash}
-                    onChange={e => setAreaFiltroDash(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
-                  >
-                    <option value="todas">Todas Áreas</option>
-                    <option value="Tráfego">Tráfego</option>
-                    <option value="Growth">Growth</option>
-                    <option value="Financeiro">Financeiro</option>
-                    <option value="RH">RH</option>
-                    <option value="Comercial">Comercial</option>
-                    <option value="Planejamento">Planejamento</option>
-                  </select>
-                  <div className="flex border rounded-md overflow-hidden">
-                    <button
-                      onClick={() => setVisualizacaoDash("grid")}
-                      className={`px-3 py-2 ${visualizacaoDash === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em grade"
-                    >
-                      <Grid3x3 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setVisualizacaoDash("tabela")}
-                      className={`px-3 py-2 ${visualizacaoDash === "tabela" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em tabela"
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {visualizacaoDash === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
-                  {errorDash ? (
-                    <div className="col-span-full">
-                      <ErrorState 
-                        message="Erro ao carregar dashboards. Tente novamente." 
-                        onRetry={() => mutateDash()}
-                      />
-                    </div>
-                  ) : loadingDash ? (
-                    [...Array(12)].map((_, i) => <SkeletonCardSmall key={i} />)
-                  ) : (
-                    (dashboards || [])
-                      ?.filter((item: Dashboard) =>
-                        areaFiltroDash === "todas" ||
-                        normalizar(item.area || "") === normalizar(areaFiltroDash)
-                      )
-                      .map((item: Dashboard) => (
-                        <CardItem
-                          key={item.id}
-                          id={item.id}
-                          title={item.nome}
-                          description={item.descricao}
-                          link={item.link}
-                          area={item.area}
-                          icon={<BarChart3 className="w-5 h-5" />}
-                          detailPath="/dashboards"
-                        />
-                      ))
-                  )}
-                  {!loadingDash && (dashboards || []).filter((item: Dashboard) =>
-                    areaFiltroDash === "todas" ||
-                    normalizar(item.area || "") === normalizar(areaFiltroDash)
-                  ).length === 0 && (
-                    <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg border overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Área</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {errorDash ? (
-                        <tr>
-                          <td colSpan={4} className="px-6 py-12">
-                            <ErrorState 
-                              message="Erro ao carregar dashboards. Tente novamente." 
-                              onRetry={() => mutateDash()}
-                            />
-                          </td>
-                        </tr>
-                      ) : loadingDash ? (
-                        [...Array(6)].map((_, i) => (
-                          <tr key={i}>
-                            <td colSpan={4} className="px-6 py-4">
-                              <div className="h-6 bg-gray-100 animate-pulse rounded"></div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        (dashboards || [])
-                          ?.filter((item: Dashboard) =>
-                            areaFiltroDash === "todas" ||
-                            normalizar(item.area || "") === normalizar(areaFiltroDash)
-                          )
-                          .map((item: Dashboard) => {
-                            return (
-                              <tr key={item.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{item.descricao}</td>
-                                <td className="px-6 py-4">
-                                  <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold">
-                                    {item.area}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex gap-3">
-                                    <Link
-                                      href={`/dashboards/${item.id}`}
-                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
-                                    >
-                                      Detalhes
-                                    </Link>
-                                    <a
-                                      href={item.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
-                                    >
-                                      Acessar <ExternalLink className="h-3 w-3" />
-                                    </a>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })
-                      )}
-                    </tbody>
-                  </table>
-                  {!loadingDash && (dashboards || []).filter((item: Dashboard) =>
-                    areaFiltroDash === "todas" ||
-                    normalizar(item.area || "") === normalizar(areaFiltroDash)
-                  ).length === 0 && (
-                    <div className="text-center py-12 text-gray-500">Nenhum resultado encontrado.</div>
-                  )}
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Documentação Tab */}
-            <TabsContent value="documentacao" id="documentacao">
-              <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  Documentação
-                </h2>
-                <div className="flex gap-2 items-center">
-                  <select
-                    value={areaFiltroDocs}
-                    onChange={e => setAreaFiltroDocs(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
-                  >
-                    <option value="todas">Todas Áreas</option>
-                    <option value="Tráfego">Tráfego</option>
-                    <option value="Growth">Growth</option>
-                    <option value="Financeiro">Financeiro</option>
-                    <option value="RH">RH</option>
-                    <option value="Comercial">Comercial</option>
-                    <option value="Planejamento">Planejamento</option>
-                  </select>
-                  <div className="flex border rounded-md overflow-hidden">
-                    <button
-                      onClick={() => setVisualizacaoDocs("grid")}
-                      className={`px-3 py-2 ${visualizacaoDocs === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em grade"
-                    >
-                      <Grid3x3 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setVisualizacaoDocs("tabela")}
-                      className={`px-3 py-2 ${visualizacaoDocs === "tabela" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em tabela"
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {visualizacaoDocs === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 grid-flow-row-dense">
-                  {errorDocs ? (
-                    <div className="col-span-full">
-                      <ErrorState 
-                        message="Erro ao carregar documentação. Tente novamente." 
-                        onRetry={() => mutateDocs()}
-                      />
-                    </div>
-                  ) : loadingDocs ? (
-                    [...Array(12)].map((_, i) => <SkeletonCardSmall key={i} />)
-                  ) : (
-                    (docs || [])
-                      ?.filter((item: Documentacao) =>
-                        areaFiltroDocs === "todas" ||
-                        normalizar(item.area || "") === normalizar(areaFiltroDocs)
-                      )
-                      .map((item: Documentacao) => (
-                        <div key={item.id} className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-5 flex flex-col justify-between h-full">
-                          <div className="mb-4">
-                            {item.area && (
-                              <span className="inline-block bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium mb-2">{item.area}</span>
-                            )}
-                            <h3 className="text-lg font-semibold text-blue-900 mb-2">{item.nome}</h3>
-                            <p className="text-sm text-blue-700">{item.descricao || ""}</p>
-                          </div>
-                          <div className="flex gap-3 flex-wrap">
-                            <Link
-                              href={`/docs/${item.id}`}
-                              className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
-                            >
-                              Detalhes
-                            </Link>
-                            <a
-                              href={item.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
-                            >
-                              Acessar <FileText className="w-5 h-5" />
-                            </a>
-                          </div>
-                        </div>
-                      ))
-                  )}
-                  {!loadingDocs && (docs || []).filter((item: Documentacao) =>
-                    areaFiltroDocs === "todas" ||
-                    normalizar(item.area || "") === normalizar(areaFiltroDocs)
-                  ).length === 0 && (
-                    <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg border overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Processo</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Área</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {errorDocs ? (
-                        <tr>
-                          <td colSpan={4} className="px-6 py-12">
-                            <ErrorState 
-                              message="Erro ao carregar documentação. Tente novamente." 
-                              onRetry={() => mutateDocs()}
-                            />
-                          </td>
-                        </tr>
-                      ) : loadingDocs ? (
-                        [...Array(6)].map((_, i) => (
-                          <tr key={i}>
-                            <td colSpan={4} className="px-6 py-4">
-                              <div className="h-6 bg-gray-100 animate-pulse rounded"></div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        (docs || [])
-                          ?.filter((item: Documentacao) =>
-                            areaFiltroDocs === "todas" ||
-                            normalizar(item.area || "") === normalizar(areaFiltroDocs)
-                          )
-                          .map((item: Documentacao) => {
-                            return (
-                              <tr key={item.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{item.descricao}</td>
-                                <td className="px-6 py-4">
-                                  <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold">
-                                    {item.area}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex gap-3">
-                                    <Link
-                                      href={`/docs/${item.id}`}
-                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
-                                    >
-                                      Detalhes
-                                    </Link>
-                                    <a
-                                      href={item.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-1"
-                                    >
-                                      Acessar <ExternalLink className="h-3 w-3" />
-                                    </a>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })
-                      )}
-                    </tbody>
-                  </table>
-                  {!loadingDocs && (docs || []).filter((item: Documentacao) =>
-                    areaFiltroDocs === "todas" ||
-                    normalizar(item.area || "") === normalizar(areaFiltroDocs)
-                  ).length === 0 && (
-                    <div className="text-center py-12 text-gray-500">Nenhum resultado encontrado.</div>
-                  )}
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Ferramentas Tab */}
-            <TabsContent value="ferramentas" id="ferramentas">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  Portal de Ferramentas
-                </h2>
-                <p className="text-gray-600">
-                  Acesso direto às principais ferramentas e plataformas utilizadas pela equipe de BI
-                </p>
-              </div>
-              {errorFerr ? (
-                <ErrorState 
-                  message="Erro ao carregar ferramentas. Tente novamente." 
-                  onRetry={() => mutateFerr()}
-                />
-              ) : loadingFerr ? (
-                [...Array(3)].map((_, i) => (
-                  <div key={i} className="h-32 bg-zinc-100 animate-pulse rounded-2xl mb-4"></div>
-                ))
-              ) : (
-                ferramentas?.map((item: Ferramenta) => (
-                  <FerramentaCard
-                    key={item.id}
-                    id={item.id}
-                    nome={item.nome}
-                    descricao={item.descricao}
-                    link={item.link}
-                    proxAtualizacao={item.proxima_atualizacao}
-                  />
-                ))
-              )}
-            </TabsContent>
-
-            {/* Pesquisas Tab */}
-            <TabsContent value="pesquisas" id="pesquisas">
-              <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  Pesquisas
-                </h2>
-                <div className="flex gap-2 w-full sm:w-auto items-center">
-                  <select
-                    value={areaFiltro}
-                    onChange={e => setAreaFiltro(e.target.value)}
-                    className="border rounded-md px-2 py-1 text-sm text-gray-700 w-full sm:w-64"
-                  >
-                    <option value="todas">Todos os Temas</option>
-                    {Array.from(new Set((pesquisas || []).map((p: any) => String(p.tema)).filter(Boolean))).map((tema, i) => (
-                      <option key={i} value={String(tema)}>{String(tema)}</option>
-                    ))}
-                  </select>
-                  <div className="flex border rounded-md overflow-hidden">
-                    <button
-                      onClick={() => setVisualizacaoPesquisas("grid")}
-                      className={`px-3 py-2 ${visualizacaoPesquisas === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em grade"
-                    >
-                      <Grid3x3 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setVisualizacaoPesquisas("lista")}
-                      className={`px-3 py-2 ${visualizacaoPesquisas === "lista" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                      title="Visualização em lista"
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className={visualizacaoPesquisas === "lista" ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"}>
-                {errorPesquisas ? (
-                  <ErrorState 
-                    message="Erro ao carregar pesquisas. Tente novamente." 
-                    onRetry={() => mutatePesquisas()}
-                  />
-                ) : loadingPesquisas ? (
-                  [...Array(6)].map((_, i) => (
-                    <div key={i} className="h-40 bg-zinc-100 animate-pulse rounded-2xl"></div>
-                  ))
-                ) : (
-                  (pesquisas || [])
-                    .filter((item: Pesquisa) => areaFiltro === "todas" || item.tema === areaFiltro)
-                    .map((item: Pesquisa) => {
-                      return (
-                        <div key={item.id} className="bg-white rounded-xl shadow-md border-l-4 border-l-blue-400 hover:shadow-lg transition-all duration-300 p-6 flex flex-col gap-2">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
-                            <span className="inline-block px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-semibold mb-1 md:mb-0">{item.tema}</span>
-                            <span className="text-xs text-gray-500">{item.data}</span>
-                          </div>
-                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.titulo}</h3>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                              <BookOpen className="w-5 h-5" />
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-600 mb-1"><span className="font-semibold">Fonte:</span> {item.fonte}</div>
-                          <div className="text-sm text-gray-700 whitespace-pre-line mb-2 line-clamp-3">{item.conteudo}</div>
-                          <div className="flex gap-3 flex-wrap">
-                            <Link href={`/pesquisas/${item.id}`} className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium text-sm">
-                              Ver Detalhes
-                            </Link>
-                            {item.link ? (
-                              <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium text-sm">
-                                Acessar pesquisa
-                              </a>
-                            ) : (
-                              <span className="text-sm text-gray-400">Link indisponível</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                )}
-                {!loadingPesquisas && (pesquisas || []).filter((item: Pesquisa) => areaFiltro === "todas" || item.tema === areaFiltro).length === 0 && (
-                  <div className="col-span-full text-center text-gray-500">Nenhum resultado encontrado.</div>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+      <section className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {destaques.map((item) => {
+            const Icon = item.icone;
+            return (
+              <Card key={item.titulo} className="border-slate-200 bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold text-slate-900">
+                    <Icon className="h-6 w-6 text-blue-700" />
+                    {item.titulo}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-base md:text-lg leading-relaxed text-slate-700">
+                    {item.descricao}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+      <section className="container mx-auto px-4 pb-14">
+        <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-700 px-6 py-8 md:px-8 md:py-10 text-white shadow-xl">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-100">Pipeline</p>
+              <h2 className="text-2xl md:text-3xl font-bold mt-2">Pipeline de Dados</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {pipelineBenefits.map((benefit) => (
+                <span
+                  key={benefit}
+                  className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+                >
+                  {benefit}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-5 gap-4">
+            {pipelineStages.map((stage, index) => {
+              const Icon = stage.icone;
+              const isLast = index === pipelineStages.length - 1;
+
+              return (
+                <div key={stage.titulo} className="relative">
+                  <Card className="h-full border-white/20 bg-white/10 text-white backdrop-blur-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm uppercase tracking-wide text-blue-50">
+                        {stage.titulo}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-xl bg-white/20 p-2.5">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-blue-50">{stage.descricao}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {!isLast && (
+                    <>
+                      <div className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 h-8 w-8 items-center justify-center rounded-full bg-white text-blue-700 shadow">
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
+                      <div className="flex md:hidden justify-center py-2">
+                        <ArrowDown className="h-4 w-4 text-blue-100" />
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pb-16">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-6 md:p-8 shadow-xl">
+          <div className="pointer-events-none absolute -top-20 -right-10 h-56 w-56 rounded-full bg-amber-200/40 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-6 h-64 w-64 rounded-full bg-cyan-200/30 blur-3xl" />
+
+          <div className="relative mb-7">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Cultura Data-Driven</p>
+            <h2 className="mt-2 text-2xl md:text-3xl font-bold text-slate-900">5 impactos para o negócio</h2>
+            <p className="mt-2 text-sm md:text-base text-slate-600">
+              Como a cultura orientada por dados gera valor real para as áreas da empresa.
+            </p>
+          </div>
+
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
+            {dataDrivenImpacts.map((item) => (
+              <Card
+                key={item.numero}
+                className="group border-slate-200 bg-white/90 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-blue-300"
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center gap-3 min-w-[84px]">
+                      <span className="h-2.5 w-2.5 rounded-sm bg-slate-400 mt-2 group-hover:bg-blue-500 transition-colors"></span>
+                      <span className="text-4xl font-black leading-none text-amber-500">{item.numero}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-base md:text-lg font-semibold text-slate-900 underline underline-offset-4 decoration-slate-300 group-hover:decoration-blue-400">
+                        {item.titulo}
+                      </h3>
+                      <p className="mt-2 text-sm md:text-base text-slate-600">{item.descricao}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 h-1 w-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-300 group-hover:w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-[linear-gradient(120deg,#0f172a_0%,#1e293b_45%,#111827_100%)] text-slate-200 border-t border-slate-700/60">
+        <div className="container mx-auto px-4 py-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
               <Image
                 src="/images/f5-logo.png"
                 alt="Control F5 Logo"
-                width={100}
-                height={26}
-                className="h-6 w-auto opacity-90"
+                width={120}
+                height={32}
+                className="h-8 w-auto opacity-95"
               />
-              <div className="border-l border-blue-200 pl-4">
-                <div className="font-bold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
-                  Business intelligence
-                </div>
-                <div className="text-sm text-blue-300">Planejamento e Estratégia</div>
+              <div className="border-l border-slate-500 pl-4">
+                <p className="text-sm font-semibold text-white">Business Intelligence</p>
+                <p className="text-xs text-slate-300">Planejamento e Estrategia</p>
               </div>
             </div>
 
-            <div className="flex space-x-6 text-sm">
-              {/* <a href="#" className="text-gray-300 hover:text-yellow-300 transition-colors">
-                Suporte Técnico
-              </a>
-              <a href="#" className="text-gray-300 hover:text-yellow-300 transition-colors">
-                Solicitar Acesso
-              </a> */}
-              <a href="mailto:thiago@controlf5.com.br" className="text-blue-100 hover:text-yellow-300 transition-colors">
-                Feedback
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <Link href="/portal" className="hover:text-white transition-colors">
+                Portal
+              </Link>
+              <Link href="/central-ajuda" className="hover:text-white transition-colors">
+                Central de Ajuda
+              </Link>
+              <Link href="/admin" className="hover:text-white transition-colors">
+                Admin
+              </Link>
+              <a href="mailto:thiago@controlf5.com.br" className="hover:text-white transition-colors">
+                Contato
               </a>
             </div>
           </div>
 
-          <div className="border-t border-blue-700 mt-6 pt-6 text-center text-sm text-blue-200">
-            © 2024 Control F5 - Área de Business Intelligence. Todos os direitos reservados.
+          <div className="mt-6 border-t border-slate-600/70 pt-5 text-center text-sm text-slate-300">
+            {"\u00a9 2024 Control F5 - \u00c1rea de Business Intelligence. Todos os direitos reservados."}
           </div>
         </div>
       </footer>
-    </div>
-  )
+    </main>
+  );
 }

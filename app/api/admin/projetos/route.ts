@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isAdminRequestAuthorized } from '@/lib/admin-access';
 import { BigQuery } from '@google-cloud/bigquery';
 
 const bigquery = new BigQuery({
@@ -20,8 +20,7 @@ function normalizeTipo(value: unknown): 'projeto' | 'dashboard' | 'documentacao'
 }
 
 async function checkAuth() {
-  const cookieStore = await cookies();
-  return cookieStore.get('admin_auth')?.value === 'true';
+  return isAdminRequestAuthorized();
 }
 
 export async function POST(request: NextRequest) {

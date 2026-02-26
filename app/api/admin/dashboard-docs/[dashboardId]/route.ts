@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isAdminRequestAuthorized } from '@/lib/admin-access';
 import {
   dashboardDocsTables,
   getDashboardDocsBigQuery,
@@ -7,8 +7,7 @@ import {
 } from '@/lib/dashboard-docs';
 
 async function checkAuth() {
-  const cookieStore = await cookies();
-  return cookieStore.get('admin_auth')?.value === 'true';
+  return isAdminRequestAuthorized();
 }
 
 export async function GET(

@@ -66,7 +66,7 @@ export default async function DashboardDetalhes({ params }: { params: Promise<{ 
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <nav className="mb-6 flex items-center gap-2 text-sm">
-          <Link href="/" className="text-blue-600 hover:underline flex items-center gap-1">
+          <Link href="/portal" className="text-blue-600 hover:underline flex items-center gap-1">
             <ArrowLeft className="h-4 w-4" />
             Portal
           </Link>
@@ -240,7 +240,7 @@ export default async function DashboardDetalhes({ params }: { params: Promise<{ 
         </div>
 
         <div className="flex gap-4 justify-center">
-          <Link href="/">
+          <Link href="/portal">
             <Button variant="outline" size="lg" className="gap-2">
               <ArrowLeft className="h-5 w-5" />
               Voltar ao Portal
