@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { TelemetryTracker } from '@/components/TelemetryTracker';
 
 export const metadata: Metadata = {
   title: 'Projetos e Soluções BI',
@@ -14,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TelemetryTracker />
+        {children}
+      </body>
     </html>
   )
 }

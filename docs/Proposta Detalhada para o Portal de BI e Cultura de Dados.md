@@ -47,6 +47,7 @@ Legenda:
 | Dicionario de dados centralizado | PARCIAL | Glossario/insights por dashboard ja existem | Criar visao corporativa unificada de metricas |
 | Nova pagina principal institucional (o que e o portal e como usar) | SIM | Rota / como LP institucional e rota /portal para conteudos | Evoluir narrativa por perfil e medir adocao |
 | Central de Ajuda / Funcionalidades | PARCIAL | Rota /central-ajuda com catalogo, fluxo e FAQ basico | Adicionar governanca de conteudo e ajuda contextual no admin |
+| Telemetria de uso do portal (page views por usuario/pagina) | PARCIAL | API `/api/telemetria/event`, API admin `/api/admin/telemetria/overview`, tela `/admin/telemetria` | Criar alertas e painel historico com comparativos |
 | Personalizacao por perfil (RBAC) | NAO | Sem segregacao por papel | Implementar autenticacao + autorizacao por perfil |
 | Acessibilidade (WCAG) | NAO | Sem checklist formal | Auditoria + correcao por prioridade |
 | Modulo Arquitetura de Dados editavel | NAO | Nao existe no portal | Comecar com visualizacao read-only + fase editavel |

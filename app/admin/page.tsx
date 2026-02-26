@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FolderKanban, BookOpen, Home, FileJson } from 'lucide-react';
+import { FolderKanban, BookOpen, Home, FileJson, BarChart3 } from 'lucide-react';
 import { LogoutButton } from '@/components/LogoutButton';
 import { authOptions, isAdminEmail } from '@/lib/auth-options';
 
@@ -39,6 +39,14 @@ export default async function AdminPage() {
       href: '/admin/dashboard-docs',
       color: 'text-indigo-600',
       bg: 'bg-indigo-50',
+    },
+    {
+      title: 'Telemetria',
+      description: 'Acompanhar paginas mais acessadas e usuarios do portal',
+      icon: BarChart3,
+      href: '/admin/telemetria',
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
     },
   ];
 
