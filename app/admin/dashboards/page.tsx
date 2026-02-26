@@ -161,6 +161,7 @@ export default function AdminDashboardsPage() {
               >
                 <option value="">Selecione...</option>
                 <option value="Tráfego">Tráfego</option>
+                <option value="Todas">Todas</option>
                 <option value="Growth">Growth</option>
                 <option value="Financeiro">Financeiro</option>
                 <option value="RH">RH</option>
@@ -191,7 +192,7 @@ export default function AdminDashboardsPage() {
                   >
                     <option value="">Selecione...</option>
                     <option value="Thiago">Thiago</option>
-                    <option value="Leandro">Leandro</option>
+                    <option value="Leonardo">Leonardo</option>
                   </select>
                 </div>
               </div>

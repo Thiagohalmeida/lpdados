@@ -36,7 +36,7 @@ const TIPO_OPTIONS: Array<{ value: ItemTipo; label: string }> = [
   { value: 'ferramenta', label: 'Plataforma' },
 ];
 
-const AREA_OPTIONS = ['Tráfego', 'Growth', 'Financeiro', 'RH', 'Comercial', 'Planejamento'];
+const AREA_OPTIONS = ['Todas', 'Tráfego', 'Growth', 'Financeiro', 'RH', 'Comercial', 'Planejamento'];
 
 function getTipoLabel(tipo: ItemTipo | undefined) {
   if (!tipo) return 'Projeto';
@@ -51,6 +51,7 @@ export default function AdminProjetosPage() {
   const [editando, setEditando] = useState<string | null>(null);
   const [criando, setCriando] = useState(false);
   const [formData, setFormData] = useState<Partial<AdminItem>>({});
+  const [tecnologiasInput, setTecnologiasInput] = useState('');
 
   useEffect(() => {
     carregarItens(filtroTipo);
@@ -85,19 +86,23 @@ export default function AdminProjetosPage() {
       tecnologias: [],
       proxima_atualizacao: '',
     });
+    setTecnologiasInput('');
     setCriando(true);
   };
 
   const iniciarEdicao = (item: AdminItem) => {
+    const tecnologias = Array.isArray(item.tecnologias) ? item.tecnologias : [];
     setFormData({
       ...item,
-      tecnologias: Array.isArray(item.tecnologias) ? item.tecnologias : [],
+      tecnologias,
     });
+    setTecnologiasInput(tecnologias.join(', '));
     setEditando(item.id);
   };
 
   const cancelar = () => {
     setFormData({});
+    setTecnologiasInput('');
     setEditando(null);
     setCriando(false);
   };
@@ -110,11 +115,16 @@ export default function AdminProjetosPage() {
         : '/api/admin/projetos';
 
       const method = editando ? 'PUT' : 'POST';
+      const tecnologias = tecnologiasInput
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
       const payload = {
         ...formData,
         tipo: tipoSelecionado,
         status: formData.status || null,
-        tecnologias: Array.isArray(formData.tecnologias) ? formData.tecnologias : [],
+        tecnologias,
         proxima_atualizacao: formData.proxima_atualizacao || null,
         data_inicio: formData.data_inicio || formData.data || null,
       };
@@ -310,16 +320,8 @@ export default function AdminProjetosPage() {
             <div>
               <label className="text-sm font-medium mb-1 block">Tecnologias (separadas por virgula)</label>
               <Input
-                value={formData.tecnologias?.join(', ') || ''}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    tecnologias: e.target.value
-                      .split(',')
-                      .map((item) => item.trim())
-                      .filter(Boolean),
-                  })
-                }
+                value={tecnologiasInput}
+                onChange={(e) => setTecnologiasInput(e.target.value)}
                 placeholder="Python, BigQuery, Looker"
               />
             </div>
@@ -355,7 +357,7 @@ export default function AdminProjetosPage() {
                   >
                     <option value="">Selecione...</option>
                     <option value="Thiago">Thiago</option>
-                    <option value="Leandro">Leandro</option>
+                    <option value="Leonardo">Leonardo</option>
                   </select>
                 </div>
               </div>

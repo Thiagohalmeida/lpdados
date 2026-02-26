@@ -265,7 +265,7 @@ export default function AdminPesquisasPage() {
                   >
                     <option value="">Selecione...</option>
                     <option value="Thiago">Thiago</option>
-                    <option value="Leandro">Leandro</option>
+                    <option value="Leonardo">Leonardo</option>
                   </select>
                 </div>
               </div>
