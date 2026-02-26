@@ -10,7 +10,7 @@ export function isAllowedDomainEmail(email?: string | null): boolean {
 
 export function getAdminAllowedEmails(): string[] {
   const fromEnv = process.env.ADMIN_ALLOWED_EMAILS;
-  const fallback = "thiago@controlf5.com.br,leonardo@controlf5.com.br";
+  const fallback = "thiago@controlf5.com.br,leonardo.tomaz@controlf5.com.br";
   return (fromEnv || fallback)
     .split(",")
     .map(item => item.trim().toLowerCase())
@@ -48,4 +48,3 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
-
