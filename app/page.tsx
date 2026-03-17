@@ -5,6 +5,7 @@ import {
   ArrowRight,
   BarChart3,
   ChartNoAxesCombined,
+  ClipboardPlus,
   Database,
   Filter,
   Files,
@@ -13,6 +14,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataHealthWidget } from "@/components/data-health/DataHealthWidget";
+import { platformRoutes } from "@/lib/platform-config";
 
 const destaques = [
   {
@@ -39,26 +42,51 @@ const pipelineStages = [
     titulo: "Fontes de dados",
     descricao: "Redes sociais, ADS, SEO, CRM e sites.",
     icone: Files,
+    cardClassName: "border-cyan-300/45 bg-cyan-400/12",
+    iconClassName: "bg-cyan-300/18 text-cyan-50",
+    titleClassName: "text-cyan-50",
+    descriptionClassName: "text-cyan-50/95",
+    connectorClassName: "bg-cyan-50 text-cyan-700 shadow-cyan-950/20",
   },
   {
     titulo: "ETL",
     descricao: "Coleta, limpeza e padronizacao dos dados.",
     icone: Filter,
+    cardClassName: "border-amber-300/45 bg-amber-300/10",
+    iconClassName: "bg-amber-300/18 text-amber-50",
+    titleClassName: "text-amber-50",
+    descriptionClassName: "text-amber-50/95",
+    connectorClassName: "bg-amber-50 text-amber-700 shadow-amber-950/20",
   },
   {
     titulo: "Armazenamento",
     descricao: "Dados estruturados em base centralizada.",
     icone: Database,
+    cardClassName: "border-emerald-300/45 bg-emerald-300/10",
+    iconClassName: "bg-emerald-300/18 text-emerald-50",
+    titleClassName: "text-emerald-50",
+    descriptionClassName: "text-emerald-50/95",
+    connectorClassName: "bg-emerald-50 text-emerald-700 shadow-emerald-950/20",
   },
   {
     titulo: "Analise",
     descricao: "Modelagem, visoes e insights acionaveis.",
     icone: BarChart3,
+    cardClassName: "border-fuchsia-300/45 bg-fuchsia-300/10",
+    iconClassName: "bg-fuchsia-300/18 text-fuchsia-50",
+    titleClassName: "text-fuchsia-50",
+    descriptionClassName: "text-fuchsia-50/95",
+    connectorClassName: "bg-fuchsia-50 text-fuchsia-700 shadow-fuchsia-950/20",
   },
   {
     titulo: "Uso",
     descricao: "Decisoes estrategicas com suporte analitico.",
     icone: Rocket,
+    cardClassName: "border-rose-300/45 bg-rose-300/10",
+    iconClassName: "bg-rose-300/18 text-rose-50",
+    titleClassName: "text-rose-50",
+    descriptionClassName: "text-rose-50/95",
+    connectorClassName: "bg-rose-50 text-rose-700 shadow-rose-950/20",
   },
 ];
 
@@ -98,7 +126,7 @@ const dataDrivenImpacts = [
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#1d4ed8_0%,#1e3a8a_45%,#0f172a_100%)] text-white">
+      <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#1d4ed8_0%,#1e3a8a_45%,#0f172a_100%)] pb-24 text-white md:pb-28">
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(120deg,transparent_0%,#ffffff_30%,transparent_60%)]" />
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl">
@@ -123,8 +151,14 @@ export default function LandingPage() {
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/central-ajuda">
+              <Link href={platformRoutes.newRequest}>
                 <Button variant="outline" className="border-white/40 text-white hover:bg-white/10 bg-transparent">
+                  Nova solicitacao
+                  <ClipboardPlus className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/central-ajuda">
+                <Button variant="outline" className="border-white/30 text-white/90 hover:bg-white/10 bg-transparent">
                   Ver Central de Ajuda
                 </Button>
               </Link>
@@ -138,7 +172,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-14">
+      <section className="bg-slate-50 pb-10 pt-8 md:pb-12 md:pt-10">
+        <div className="container mx-auto px-4">
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-4 md:p-6">
+            <DataHealthWidget embedded />
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-8 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {destaques.map((item) => {
             const Icon = item.icone;
@@ -187,25 +229,27 @@ export default function LandingPage() {
 
               return (
                 <div key={stage.titulo} className="relative">
-                  <Card className="h-full border-white/20 bg-white/10 text-white backdrop-blur-sm">
+                  <Card className={`h-full text-white backdrop-blur-sm ${stage.cardClassName}`}>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm uppercase tracking-wide text-blue-50">
+                      <CardTitle className={`text-sm uppercase tracking-wide ${stage.titleClassName}`}>
                         {stage.titulo}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-white/20 p-2.5">
+                        <div className={`rounded-xl p-2.5 ${stage.iconClassName}`}>
                           <Icon className="h-5 w-5" />
                         </div>
-                        <p className="text-sm text-blue-50">{stage.descricao}</p>
+                        <p className={`text-sm ${stage.descriptionClassName}`}>{stage.descricao}</p>
                       </div>
                     </CardContent>
                   </Card>
 
                   {!isLast && (
                     <>
-                      <div className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 h-8 w-8 items-center justify-center rounded-full bg-white text-blue-700 shadow">
+                      <div
+                        className={`hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 h-8 w-8 items-center justify-center rounded-full shadow ${stage.connectorClassName}`}
+                      >
                         <ArrowRight className="h-4 w-4" />
                       </div>
                       <div className="flex md:hidden justify-center py-2">

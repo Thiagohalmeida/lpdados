@@ -78,6 +78,61 @@ export interface Pesquisa extends CamposGestao {
   tema: string;
 }
 
+export type StatusDemanda =
+  | 'nova'
+  | 'em analise'
+  | 'em desenvolvimento'
+  | 'entregue'
+  | 'cancelada';
+
+export type PrioridadeDemanda = 'baixa' | 'media' | 'alta' | 'urgente';
+
+export interface Demanda {
+  id: string;
+  titulo: string;
+  descricao: string;
+  area: string;
+  solicitante: string;
+  email?: string;
+  tipo?: string;
+  prioridade: PrioridadeDemanda;
+  status: StatusDemanda;
+  projeto_id?: string | null;
+  data_abertura: string;
+  data_atualizacao?: string;
+  observacao?: string;
+}
+
+export type StatusTabela = 'ok' | 'alerta' | 'atrasado';
+
+export interface TabelaStatus {
+  id: string;
+  dataset_name?: string;
+  table_name?: string;
+  nome_tabela: string;
+  descricao?: string;
+  ultima_atualizacao?: string;
+  proxima_atualizacao?: string;
+  status: StatusTabela;
+  impacto?: string;
+  responsavel?: string;
+  fonte?: string;
+  observacao?: string;
+  ativo_portal?: boolean;
+}
+
+export interface TabelaBigQueryCatalogo {
+  dataset_name: string;
+  table_name: string;
+  last_updated?: string;
+}
+
+export interface TabelasStatusResponse {
+  items: TabelaStatus[];
+  fetchedAt: string;
+  lastRealUpdate?: string;
+}
+
 /**
  * Filtros para projetos
  */
@@ -99,8 +154,8 @@ export interface FiltrosGerais {
  * Resultado de busca unificada
  */
 export interface ResultadoBusca {
-  tipo: 'projeto' | 'dashboard' | 'doc' | 'ferramenta' | 'pesquisa';
-  item: Projeto | Dashboard | Documentacao | Ferramenta | Pesquisa;
+  tipo: 'projeto' | 'dashboard' | 'doc' | 'ferramenta' | 'pesquisa' | 'demanda' | 'tabela-status';
+  item: Projeto | Dashboard | Documentacao | Ferramenta | Pesquisa | Demanda | TabelaStatus;
   score: number;
 }
 

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protótipo — LP Dados Novas Funcionalidades</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-950: #0c1a4e;
+    --blue-900: #1e3a8a;
+    --blue-700: #1d4ed8;
+    --blue-500: #3b82f6;
+    --blue-200: #bfdbfe;
+    --blue-50: #eff6ff;
+    --green-500: #22c55e;
+    --green-100: #dcfce7;
+    --amber-500: #f59e0b;
+    --amber-100: #fef3c7;
+    --red-500: #ef4444;
+    --red-100: #fee2e2;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-500: #64748b;
+    --slate-300: #cbd5e1;
+    --slate-100: #f1f5f9;
+    --white: #ffffff;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--slate-100); color: var(--slate-900); }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--blue-950);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .nav-logo-dot { width: 28px; height: 28px; background: var(--blue-500); border-radius: 7px; display:flex;align-items:center;justify-content:center; }
+  .nav-logo-dot svg { width:16px; height:16px; }
+  .nav-title { color: white; font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+  .nav-sub { color: rgba(255,255,255,0.45); font-size: 12px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; padding: 6px 14px;
+    border-radius: 8px; cursor: pointer; transition: all 0.15s; border: none; background: none;
+  }
+  .nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+  .nav-tab.active { color: white; background: var(--blue-700); }
+  .badge-new {
+    background: var(--blue-500); color: white; font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle;
+  }
+
+  /* SECTIONS */
+  .section { display: none; padding: 40px 32px; max-width: 1100px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* SECTION: DEMANDAS */
+  .section-header { margin-bottom: 32px; }
+  .section-header h1 { font-size: 26px; font-weight: 700; color: var(--blue-900); letter-spacing: -0.5px; }
+  .section-header p { color: var(--slate-500); margin-top: 6px; font-size: 14px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1.3fr; gap: 28px; align-items: start; }
+
+  /* FORM */
+  .form-card {
+    background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 28px; border: 1px solid rgba(0,0,0,0.05);
+  }
+  .form-card h2 { font-size: 16px; font-weight: 700; color: var(--blue-900); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .form-card h2 .dot { width: 8px; height: 8px; background: var(--blue-500); border-radius: 50%; }
+  .field-group { margin-bottom: 16px; }
+  .field-group label { display: block; font-size: 12px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field-group input, .field-group select, .field-group textarea {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--slate-300);
+    border-radius: 8px; font-family: inherit; font-size: 14px; color: var(--slate-900);
+    background: var(--slate-100); transition: border 0.15s, box-shadow 0.15s; outline: none;
+  }
+  .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+    border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); background: white;
+  }
+  .field-group textarea { resize: none; min-height: 90px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .prio-row { display: flex; gap: 8px; }
+  .prio-btn {
+    flex: 1; padding: 8px 4px; border: 2px solid var(--slate-200); border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer; background: white; transition: all 0.15s;
+    text-align: center;
+  }
+  .prio-btn.baixa:hover, .prio-btn.baixa.sel { border-color: var(--green-500); background: var(--green-100); color: #166534; }
+  .prio-btn.media:hover, .prio-btn.media.sel { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-900); }
+  .prio-btn.alta:hover, .prio-btn.alta.sel { border-color: var(--amber-500); background: var(--amber-100); color: #92400e; }
+  .prio-btn.urgente:hover, .prio-btn.urgente.sel { border-color: var(--red-500); background: var(--red-100); color: #991b1b; }
+
+  .btn-primary {
+    width: 100%; padding: 12px; background: var(--blue-700); color: white;
+    border: none; border-radius: 8px; font-family: inherit; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--blue-900); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,78,216,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* SUCCESS */
+  .success-msg {
+    display: none; background: var(--green-100); border: 1px solid var(--green-500);
+    border-radius: 10px; padding: 16px; text-align: center; margin-top: 12px;
+  }
+  .success-msg.show { display: block; animation: fadeIn 0.3s ease; }
+  .success-msg strong { color: #166534; font-size: 15px; }
+  .success-msg p { color: #14532d; font-size: 13px; margin-top: 4px; }
+
+  /* DEMANDAS LIST */
+  .demandas-list { display: flex; flex-direction: column; gap: 14px; }
+  .demanda-card {
+    background: white; border-radius: var(--radius); padding: 18px 20px;
+    border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.15s; cursor: pointer;
+  }
+  .demanda-card:hover { box-shadow: var(--shadow); }
+  .demanda-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .demanda-title { font-size: 15px; font-weight: 600; color: var(--blue-900); }
+  .demanda-desc { font-size: 13px; color: var(--slate-500); margin-top: 4px; }
+  .demanda-meta { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .chip {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .chip-nova { background: #e0f2fe; color: #0369a1; }
+  .chip-analise { background: #fef3c7; color: #92400e; }
+  .chip-dev { background: #dbeafe; color: var(--blue-900); }
+  .chip-entregue { background: var(--green-100); color: #166534; }
+  .chip-area { background: var(--slate-100); color: var(--slate-700); }
+  .chip-prio-baixa { background: var(--green-100); color: #166534; }
+  .chip-prio-media { background: #e0f2fe; color: #0369a1; }
+  .chip-prio-alta { background: var(--amber-100); color: #92400e; }
+  .chip-prio-urgente { background: var(--red-100); color: #991b1b; }
+  .linked-project {
+    font-size: 12px; color: var(--blue-700); font-weight: 500;
+    display: flex; align-items: center; gap: 4px; margin-left: auto;
+  }
+  .linked-project svg { width: 12px; height: 12px; }
+
+  /* SECTION: STATUS TABELAS */
+  .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .status-card {
+    background: white; border-radius: var(--radius); padding: 20px;
+    border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--slate-300); transition: box-shadow 0.15s;
+  }
+  .status-card:hover { box-shadow: var(--shadow); }
+  .status-card.ok { border-left-color: var(--green-500); }
+  .status-card.alerta { border-left-color: var(--amber-500); }
+  .status-card.atrasado { border-left-color: var(--red-500); }
+  .status-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .status-name { font-size: 14px; font-weight: 700; color: var(--blue-900); }
+  .status-source { font-size: 11px; color: var(--slate-500); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+  .ok .status-dot { background: var(--green-500); box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+  .alerta .status-dot { background: var(--amber-500); box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+  .atrasado .status-dot { background: var(--red-500); box-shadow: 0 0 0 3px rgba(239,68,68,0.2); animation: pulse 1.5s infinite; }
+  .status-info { font-size: 12px; color: var(--slate-600); }
+  .status-info span { font-weight: 600; color: var(--slate-700); }
+  .status-obs { margin-top: 10px; font-size: 11px; color: var(--slate-500); background: var(--slate-100); padding: 7px 10px; border-radius: 6px; font-style: italic; }
+  .status-summary {
+    display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .status-sum-card {
+    flex: 1; min-width: 140px; background: white; border-radius: var(--radius); padding: 16px 20px;
+    box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.05);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .status-sum-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .status-sum-icon.ok { background: var(--green-100); color: var(--green-500); }
+  .status-sum-icon.alerta { background: var(--amber-100); color: var(--amber-500); }
+  .status-sum-icon.atrasado { background: var(--red-100); color: var(--red-500); }
+  .status-sum-num { font-size: 28px; font-weight: 700; color: var(--slate-900); line-height: 1; }
+  .status-sum-lbl { font-size: 12px; color: var(--slate-500); margin-top: 2px; }
+
+  /* SECTION: CENTRAL DE AJUDA */
+  .help-hero {
+    background: linear-gradient(135deg, var(--blue-900) 0%, #1e40af 60%, #1d4ed8 100%);
+    border-radius: 16px; padding: 40px; margin-bottom: 32px; position: relative; overflow: hidden;
+  }
+  .help-hero::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px; background: rgba(255,255,255,0.05); border-radius: 50%;
+  }
+  .help-hero h1 { color: white; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .help-hero p { color: rgba(255,255,255,0.7); font-size: 15px; margin-top: 8px; max-width: 500px; }
+  .help-search {
+    margin-top: 20px; display: flex; gap: 0; max-width: 460px;
+    background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .help-search input {
+    flex: 1; border: none; padding: 12px 16px; font-family: inherit; font-size: 14px; outline: none;
+  }
+  .help-search button {
+    background: var(--blue-700); border: none; padding: 12px 20px; color: white;
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .help-search button:hover { background: var(--blue-900); }
+  .help-intents { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .intent-chip {
+    background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.15s;
+  }
+  .intent-chip:hover { background: rgba(255,255,255,0.22); }
+
+  /* STEPPER */
+  .stepper-wrap { background: white; border-radius: var(--radius); padding: 28px 32px; margin-bottom: 28px; box-shadow: var(--shadow); }
+  .stepper-wrap h2 { font-size: 16px; font-weight: 700; color: var(--blue-900); margin-bottom: 24px; }
+  .stepper { display: flex; gap: 0; position: relative; }
+  .stepper::before {
+    content: ''; position: absolute; top: 24px; left: 24px; right: 24px; height: 2px;
+    background: var(--slate-200); z-index: 0;
+  }
+  .step { flex: 1; text-align: center; position: relative; z-index: 1; cursor: pointer; }
+  .step-circle {
+    width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; transition: all 0.2s;
+    border: 2px solid var(--slate-200); background: white; color: var(--slate-400);
+  }
+  .step.done .step-circle { background: var(--blue-700); border-color: var(--blue-700); color: white; }
+  .step.active .step-circle {
+    background: white; border-color: var(--blue-500); color: var(--blue-700);
+    box-shadow: 0 0 0 5px rgba(59,130,246,0.15);
+  }
+  .step-label { font-size: 12px; font-weight: 600; color: var(--slate-500); }
+  .step.done .step-label, .step.active .step-label { color: var(--blue-800); }
+  .step-detail { margin-top: 24px; background: var(--blue-50); border-radius: 10px; padding: 20px; border: 1px solid var(--blue-200); display: none; }
+  .step-detail.show { display: block; animation: fadeIn 0.2s ease; }
+  .step-detail h3 { font-size: 15px; font-weight: 700; color: var(--blue-900); margin-bottom: 8px; }
+  .step-detail p { font-size: 14px; color: var(--slate-600); line-height: 1.6; }
+  .step-detail .example { margin-top: 12px; background: white; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--slate-600); border-left: 3px solid var(--blue-500); }
+
+  /* FAQ */
+  .faq-section { background: white; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); margin-bottom: 24px; }
+  .faq-section h2 { font-size: 16px; font-weight: 700; color: var(--blue-900); margin-bottom: 20px; }
+  .faq-cats { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .faq-cat {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1.5px solid var(--slate-200); background: white; transition: all 0.15s;
+  }
+  .faq-cat.active { background: var(--blue-700); color: white; border-color: var(--blue-700); }
+  .faq-item { border-bottom: 1px solid var(--slate-100); }
+  .faq-q {
+    padding: 14px 0; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; font-size: 14px; font-weight: 500; color: var(--slate-800);
+    transition: color 0.15s;
+  }
+  .faq-q:hover { color: var(--blue-700); }
+  .faq-q .chevron { width: 18px; height: 18px; transition: transform 0.2s; flex-shrink: 0; }
+  .faq-q.open { color: var(--blue-700); }
+  .faq-q.open .chevron { transform: rotate(180deg); }
+  .faq-a { padding: 0 0 14px; font-size: 13px; color: var(--slate-600); line-height: 1.7; display: none; }
+  .faq-a.show { display: block; animation: fadeIn 0.2s ease; }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 48px 24px; color: var(--slate-400); }
+  .empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .empty p { font-size: 14px; }
+
+  /* PILLS FILTER */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filter-pill {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1.5px solid var(--slate-200); background: white; transition: all 0.15s;
+  }
+  .filter-pill.active { background: var(--blue-700); color: white; border-color: var(--blue-700); }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.4px; margin-right: 4px; }
+  .count-badge { background: var(--slate-100); color: var(--slate-600); font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="white" opacity="0.9"/><circle cx="8" cy="8" r="2" fill="#3b82f6"/></svg>
+    </div>
+    <div>
+      <div class="nav-title">Portal BI</div>
+      <div class="nav-sub">Control F5 — Business Intelligence</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="switchTab('portal')">Portal</button>
+    <button class="nav-tab active" onclick="switchTab('demandas')">Demandas <span class="badge-new">NOVO</span></button>
+    <button class="nav-tab" onclick="switchTab('status')">Status Tabelas <span class="badge-new">NOVO</span></button>
+    <button class="nav-tab" onclick="switchTab('ajuda')">Central de Ajuda</button>
+  </div>
+</nav>
+
+<!-- ================================================ DEMANDAS ================================================ -->
+<div id="tab-demandas" class="section active">
+  <div class="section-header">
+    <h1>Central de Demandas</h1>
+    <p>Abra uma solicitação para a equipe de BI — análises, novos dashboards ou projetos de dados.</p>
+  </div>
+  <div class="two-col">
+    <!-- FORM -->
+    <div class="form-card">
+      <h2><span class="dot"></span> Abrir nova demanda</h2>
+      <div class="field-group">
+        <label>Título da demanda *</label>
+        <input id="f-titulo" type="text" placeholder="Ex: Dashboard de performance por cliente" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Área solicitante *</label>
+          <select id="f-area">
+            <option value="">Selecione...</option>
+            <option>Tráfego</option>
+            <option>Growth</option>
+            <option>Financeiro</option>
+            <option>RH</option>
+            <option>Comercial</option>
+            <option>Planejamento</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Tipo</label>
+          <select id="f-tipo">
+            <option>Dashboard</option>
+            <option>Análise pontual</option>
+            <option>Automação</option>
+            <option>Relatório</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Prioridade *</label>
+        <div class="prio-row">
+          <button class="prio-btn baixa" onclick="setPrio(this,'baixa')">Baixa</button>
+          <button class="prio-btn media sel" onclick="setPrio(this,'media')">Média</button>
+          <button class="prio-btn alta" onclick="setPrio(this,'alta')">Alta</button>
+          <button class="prio-btn urgente" onclick="setPrio(this,'urgente')">Urgente</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Descrição detalhada *</label>
+        <textarea id="f-desc" placeholder="Descreva o que precisa, contexto, objetivo e prazo desejado..."></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Seu nome *</label>
+          <input id="f-nome" type="text" placeholder="Nome completo" />
+        </div>
+        <div class="field-group">
+          <label>E-mail</label>
+          <input id="f-email" type="email" placeholder="seu@controlf5.com.br" />
+        </div>
+      </div>
+      <button class="btn-primary" onclick="enviarDemanda()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar demanda
+      </button>
+      <div class="success-msg" id="successMsg">
+        <strong>✅ Demanda aberta com sucesso!</strong>
+        <p>A equipe de BI recebeu sua solicitação. Acompanhe o status nesta página.</p>
+      </div>
+    </div>
+
+    <!-- DEMANDAS LIST -->
+    <div>
+      <div class="filter-row">
+        <span class="filter-label">Status:</span>
+        <button class="filter-pill active" onclick="filterDemandas('todas',this)">Todas</button>
+        <button class="filter-pill" onclick="filterDemandas('nova',this)">Nova</button>
+        <button class="filter-pill" onclick="filterDemandas('em análise',this)">Em análise</button>
+        <button class="filter-pill" onclick="filterDemandas('em desenvolvimento',this)">Em desenvolv.</button>
+        <button class="filter-pill" onclick="filterDemandas('entregue',this)">Entregue</button>
+      </div>
+      <div class="demandas-list" id="demandasList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================ STATUS TABELAS ================================================ -->
+<div id="tab-status" class="section">
+  <div class="section-header">
+    <h1>Saúde dos Dados</h1>
+    <p>Status de atualização das tabelas do BigQuery utilizadas nos dashboards.</p>
+  </div>
+  <div class="status-summary">
+    <div class="status-sum-card">
+      <div class="status-sum-icon ok">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div><div class="status-sum-num" id="cnt-ok">0</div><div class="status-sum-lbl">Atualizadas</div></div>
+    </div>
+    <div class="status-sum-card">
+      <div class="status-sum-icon alerta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div><div class="status-sum-num" id="cnt-alerta">0</div><div class="status-sum-lbl">Alerta</div></div>
+    </div>
+    <div class="status-sum-card">
+      <div class="status-sum-icon atrasado">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div><div class="status-sum-num" id="cnt-atrasado">0</div><div class="status-sum-lbl">Atrasadas</div></div>
+    </div>
+    <div class="status-sum-card" style="border:1px solid var(--blue-200); background: var(--blue-50);">
+      <div class="status-sum-icon" style="background:var(--blue-200);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue-700)" stroke-width="2.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      </div>
+      <div><div class="status-sum-num" id="cnt-total">0</div><div class="status-sum-lbl">Total de tabelas</div></div>
+    </div>
+  </div>
+  <div class="status-grid" id="statusGrid"></div>
+</div>
+
+<!-- ================================================ CENTRAL DE AJUDA ================================================ -->
+<div id="tab-ajuda" class="section">
+  <div class="help-hero">
+    <h1>Central de Ajuda</h1>
+    <p>Como usar o Portal BI de forma rápida e eficiente.</p>
+    <div class="help-search">
+      <input type="text" placeholder="O que você precisa fazer?" id="helpSearchInput" oninput="helpSearch()" />
+      <button>Buscar</button>
+    </div>
+    <div class="help-intents">
+      <div class="intent-chip" onclick="setHelpIntent('dashboards')">📊 Ver dashboards</div>
+      <div class="intent-chip" onclick="setHelpIntent('demanda')">📝 Abrir demanda</div>
+      <div class="intent-chip" onclick="setHelpIntent('novo')">🆕 Sou novo aqui</div>
+      <div class="intent-chip" onclick="setHelpIntent('admin')">⚙️ Sou admin</div>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper-wrap">
+    <h2>Como funciona o portal — 4 passos</h2>
+    <div class="stepper" id="stepper">
+      <div class="step done" onclick="setStep(0)">
+        <div class="step-circle">1</div>
+        <div class="step-label">Explore</div>
+      </div>
+      <div class="step active" onclick="setStep(1)">
+        <div class="step-circle">2</div>
+        <div class="step-label">Filtre</div>
+      </div>
+      <div class="step" onclick="setStep(2)">
+        <div class="step-circle">3</div>
+        <div class="step-label">Aprofunde</div>
+      </div>
+      <div class="step" onclick="setStep(3)">
+        <div class="step-circle">4</div>
+        <div class="step-label">Solicite</div>
+      </div>
+    </div>
+    <div id="stepDetails"></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <h2>Perguntas frequentes</h2>
+    <div class="faq-cats">
+      <button class="faq-cat active" onclick="filterFaq('todos',this)">Todos</button>
+      <button class="faq-cat" onclick="filterFaq('acesso',this)">Acesso</button>
+      <button class="faq-cat" onclick="filterFaq('dashboards',this)">Dashboards</button>
+      <button class="faq-cat" onclick="filterFaq('demandas',this)">Demandas</button>
+      <button class="faq-cat" onclick="filterFaq('dados',this)">Dados</button>
+    </div>
+    <div id="faqList"></div>
+  </div>
+</div>
+
+<!-- ================================================ PORTAL (placeholder) ================================================ -->
+<div id="tab-portal" class="section">
+  <div class="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+    <p>Esta aba representa o <strong>Portal principal</strong> existente (projetos, dashboards, docs, ferramentas, pesquisas).<br>As novas abas ao lado mostram as funcionalidades propostas.</p>
+  </div>
+</div>
+
+<script>
+// ======== DADOS MOCK =========
+const demandas = [
+  { id:1, titulo:"Dashboard de performance por canal pago", area:"Tráfego", tipo:"Dashboard", status:"em desenvolvimento", prioridade:"alta", solicitante:"Ana Lima", desc:"Precisamos de um painel que consolide Google Ads, Meta e LinkedIn com métricas de CPC, CPL e ROAS por mês.", projeto:"Dashboard Tráfego Pago" },
+  { id:2, titulo:"Análise de churn de clientes Q1 2026", area:"Comercial", tipo:"Análise pontual", status:"em análise", prioridade:"urgente", solicitante:"Pedro Alves", desc:"Precisamos entender quais clientes cancelaram no Q1 e os principais motivos.", projeto:null },
+  { id:3, titulo:"Relatório mensal financeiro automatizado", area:"Financeiro", tipo:"Relatório", status:"nova", prioridade:"média", solicitante:"Carla Souza", desc:"Automatizar o relatório mensal que hoje é feito manualmente em planilha.", projeto:null },
+  { id:4, titulo:"Dashboard de pipeline comercial", area:"Comercial", tipo:"Dashboard", status:"entregue", prioridade:"alta", solicitante:"Roberto Gomes", desc:"Painel com funil de vendas, taxa de conversão por etapa e forecast.", projeto:"CRM Analytics" },
+];
+
+const tabelas = [
+  { nome:"ads_google_campaigns", fonte:"Google Ads API", status:"ok", ultima:"há 2 horas", proxima:"em 22 horas", obs:null },
+  { nome:"ads_meta_insights", fonte:"Meta Business API", status:"ok", ultima:"há 3 horas", proxima:"em 21 horas", obs:null },
+  { nome:"crm_clientes", fonte:"HubSpot API", status:"ok", ultima:"há 1 hora", proxima:"em 23 horas", obs:null },
+  { nome:"financeiro_nf", fonte:"ERP interno", status:"alerta", ultima:"há 26 horas", proxima:"hoje 18h", obs:"ETL aguardando janela de manutenção do ERP." },
+  { nome:"seo_keywords", fonte:"Semrush API", status:"ok", ultima:"há 4 horas", proxima:"em 20 horas", obs:null },
+  { nome:"rh_headcount", fonte:"Google Sheets", status:"atrasado", ultima:"há 3 dias", proxima:"—", obs:"Atualização manual pendente. Contatar: Renata (RH)." },
+  { nome:"leads_mkt", fonte:"RD Station API", status:"ok", ultima:"há 30 min", proxima:"em 23h30", obs:null },
+  { nome:"planejamento_kpis", fonte:"BigQuery manual", status:"alerta", ultima:"há 2 dias", proxima:"amanhã", obs:"Aguardando revisão do planejamento pelo Thiago." },
+];
+
+const faqData = [
+  { cat:"acesso", q:"Como faço login no portal?", a:"O portal principal é aberto a todos os colaboradores sem login. Para acessar o painel administrativo (/admin), você precisa das credenciais de admin fornecidas pela equipe de BI." },
+  { cat:"acesso", q:"Esqueci a senha do admin. O que faço?", a:"Entre em contato com a equipe de BI pelo e-mail thiago@controlf5.com.br para redefinir o acesso." },
+  { cat:"dashboards", q:"Por que os dados do meu dashboard estão desatualizados?", a:"Consulte a aba 'Status Tabelas' no portal para verificar o estado de cada fonte de dados. Se uma tabela estiver marcada como 'Atrasada' ou 'Alerta', a equipe de BI está ciente e trabalhando na correção." },
+  { cat:"dashboards", q:"Como acesso um dashboard que não aparece na lista?", a:"Pode ser que o dashboard ainda não tenha sido cadastrado no portal. Abra uma demanda informando o nome do dashboard desejado e a equipe de BI irá incluí-lo." },
+  { cat:"demandas", q:"Quanto tempo leva para minha demanda ser atendida?", a:"O prazo varia conforme a complexidade e prioridade. Demandas urgentes são avaliadas em até 1 dia útil; demandas normais em até 5 dias úteis. Você acompanha o status nesta mesma página." },
+  { cat:"demandas", q:"Posso abrir uma demanda em nome de outra pessoa?", a:"Sim. Informe o nome e e-mail da pessoa que solicitou no campo correspondente do formulário." },
+  { cat:"dados", q:"O que é o 'Status de Tabelas'?", a:"É um painel que mostra quando cada tabela do banco de dados foi atualizada pela última vez, e quando será a próxima atualização. Isso ajuda a entender se os dados dos dashboards são recentes." },
+  { cat:"dados", q:"Posso solicitar uma nova fonte de dados?", a:"Sim! Abra uma demanda do tipo 'Automação' descrevendo a fonte que deseja integrar (ex: nova plataforma de ADS, sistema interno). A equipe de BI avaliará a viabilidade." },
+];
+
+const stepInfo = [
+  { title:"Explore os módulos disponíveis", text:"No Portal (/portal) você encontra Projetos, Dashboards, Documentação, Ferramentas e Pesquisas. Cada aba tem seu propósito — Projetos mostra iniciativas de BI, Dashboards leva direto aos painéis, Documentação tem os processos internos.", example:"Acesse /portal → clique na aba 'Dashboards' → veja todos os painéis disponíveis organizados por área." },
+  { title:"Use filtros e busca para encontrar o que precisa", text:"Cada aba tem filtros por área e busca por texto. Na aba Projetos, há também filtro por status (Em Desenvolvimento, Entregue, Standby). Use a busca global no canto superior direito para encontrar qualquer item.", example:"Na aba 'Projetos', filtre por 'Em Desenvolvimento' para ver o que está sendo construído agora." },
+  { title:"Abra o detalhe para ver contexto completo", text:"Cada card tem um botão 'Detalhes' que abre a página completa do item, com todos os campos de gestão: responsável, data de início, observações e links relacionados.", example:"Clique em 'Detalhes' em qualquer projeto para ver quem é o responsável e qual o contexto completo." },
+  { title:"Abra uma demanda para solicitar algo novo", text:"Se você precisa de uma análise, novo dashboard ou automação, use a Central de Demandas. Preencha o formulário com título, descrição e prioridade. A equipe de BI receberá e processará sua solicitação.", example:"Acesse 'Demandas' no menu → clique em 'Abrir nova demanda' → descreva o que precisa." },
+];
+
+// ======== TAB NAVIGATION =========
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ======== PRIORIDADE =========
+let prioSel = 'media';
+function setPrio(btn, val) {
+  document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  prioSel = val;
+}
+
+// ======== ENVIAR DEMANDA =========
+function enviarDemanda() {
+  const titulo = document.getElementById('f-titulo').value.trim();
+  const area = document.getElementById('f-area').value;
+  const desc = document.getElementById('f-desc').value.trim();
+  const nome = document.getElementById('f-nome').value.trim();
+  if (!titulo || !area || !desc || !nome) {
+    alert('Preencha todos os campos obrigatórios (*)');
+    return;
+  }
+  const novo = {
+    id: Date.now(), titulo, area,
+    tipo: document.getElementById('f-tipo').value,
+    status: 'nova', prioridade: prioSel,
+    solicitante: nome, desc, projeto: null
+  };
+  demandas.unshift(novo);
+  renderDemandas('todas');
+  document.getElementById('successMsg').classList.add('show');
+  document.getElementById('f-titulo').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-area').value = '';
+  setTimeout(() => document.getElementById('successMsg').classList.remove('show'), 4000);
+}
+
+// ======== RENDER DEMANDAS =========
+function renderDemandas(filtro) {
+  const list = document.getElementById('demandasList');
+  const items = filtro === 'todas' ? demandas : demandas.filter(d => d.status === filtro);
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><p>Nenhuma demanda encontrada.</p></div>';
+    return;
+  }
+  list.innerHTML = items.map(d => `
+    <div class="demanda-card">
+      <div class="demanda-top">
+        <div>
+          <div class="demanda-title">${d.titulo}</div>
+          <div class="demanda-desc">${d.desc.substring(0,90)}...</div>
+        </div>
+      </div>
+      <div class="demanda-meta">
+        <span class="chip chip-${d.status.replace(' ','-').replace('é','e').replace('ç','c')}">${statusLabel(d.status)}</span>
+        <span class="chip chip-area">${d.area}</span>
+        <span class="chip chip-prio-${d.prioridade}">${d.prioridade}</span>
+        <span style="font-size:12px;color:var(--slate-500);margin-left:4px">por ${d.solicitante}</span>
+        ${d.projeto ? `<span class="linked-project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Projeto: ${d.projeto}</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function statusLabel(s) {
+  const map = { nova:'Nova', 'em análise':'Em Análise', 'em desenvolvimento':'Em Desenvolvimento', entregue:'Entregue', cancelada:'Cancelada' };
+  return map[s] || s;
+}
+
+function filterDemandas(filtro, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderDemandas(filtro);
+}
+
+// ======== RENDER STATUS TABELAS =========
+function renderStatus() {
+  const grid = document.getElementById('statusGrid');
+  let ok=0, alerta=0, atrasado=0;
+  tabelas.forEach(t => { if(t.status==='ok') ok++; else if(t.status==='alerta') alerta++; else atrasado++; });
+  document.getElementById('cnt-ok').textContent = ok;
+  document.getElementById('cnt-alerta').textContent = alerta;
+  document.getElementById('cnt-atrasado').textContent = atrasado;
+  document.getElementById('cnt-total').textContent = tabelas.length;
+  grid.innerHTML = tabelas.map(t => `
+    <div class="status-card ${t.status}">
+      <div class="status-header">
+        <div>
+          <div class="status-name">${t.nome}</div>
+          <div class="status-source">${t.fonte}</div>
+        </div>
+        <div class="status-dot"></div>
+      </div>
+      <div class="status-info">
+        <div>Última atualização: <span>${t.ultima}</span></div>
+        <div style="margin-top:4px">Próxima: <span>${t.proxima}</span></div>
+      </div>
+      ${t.obs ? `<div class="status-obs">${t.obs}</div>` : ''}
+    </div>`).join('');
+}
+
+// ======== STEPPER =========
+let currentStep = 1;
+function renderStepper() {
+  const steps = document.querySelectorAll('#stepper .step');
+  steps.forEach((s, i) => {
+    s.classList.remove('done','active');
+    if (i < currentStep) s.classList.add('done');
+    else if (i === currentStep) s.classList.add('active');
+  });
+  const det = document.getElementById('stepDetails');
+  const info = stepInfo[currentStep];
+  det.innerHTML = `<div class="step-detail show"><h3>${info.title}</h3><p>${info.text}</p><div class="example">💡 Exemplo: ${info.example}</div></div>`;
+}
+function setStep(i) {
+  currentStep = i;
+  renderStepper();
+}
+
+// ======== FAQ =========
+function renderFaq(cat) {
+  const items = cat === 'todos' ? faqData : faqData.filter(f => f.cat === cat);
+  document.getElementById('faqList').innerHTML = items.map((f, i) => `
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="faq-q-${i}">
+        ${f.q}
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a" id="faq-a-${i}">${f.a}</div>
+    </div>`).join('');
+}
+function toggleFaq(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+  document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('show'));
+  if (!isOpen) {
+    el.classList.add('open');
+    const idx = el.id.replace('faq-q-', '');
+    document.getElementById('faq-a-' + idx).classList.add('show');
+  }
+}
+function filterFaq(cat, btn) {
+  document.querySelectorAll('.faq-cat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFaq(cat);
+}
+
+function helpSearch() {
+  const q = document.getElementById('helpSearchInput').value.toLowerCase();
+  if (!q) { renderFaq('todos'); return; }
+  const filtered = faqData.filter(f => f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q));
+  const list = document.getElementById('faqList');
+  if (!filtered.length) { list.innerHTML = '<div class="empty"><p>Nenhum resultado para "'+q+'"</p></div>'; return; }
+  list.innerHTML = filtered.map((f, i) => `
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="faq-q-s-${i}">
+        ${f.q}
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a" id="faq-a-s-${i}">${f.a}</div>
+    </div>`).join('');
+}
+
+function setHelpIntent(intent) {
+  const map = { dashboards:'dashboards', demanda:'demandas', novo:'acesso', admin:'acesso' };
+  const cat = map[intent] || 'todos';
+  document.querySelectorAll('.faq-cat').forEach(b => b.classList.remove('active'));
+  const btn = [...document.querySelectorAll('.faq-cat')].find(b => b.textContent.toLowerCase().includes(cat));
+  if (btn) { btn.classList.add('active'); renderFaq(cat); }
+  if (intent === 'dashboards') setStep(1);
+  if (intent === 'demanda') setStep(3);
+  if (intent === 'novo') setStep(0);
+}
+
+// ======== INIT =========
+renderDemandas('todas');
+renderStatus();
+renderFaq('todos');
+renderStepper();
+</script>
+</body>
+</html>

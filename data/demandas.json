@@ -1,0 +1,44 @@
+[
+  {
+    "id": "10a74209-b148-4f3f-bc9f-12688704550c",
+    "titulo": "Inserir novos indicadores",
+    "descricao": "Inserir os seguintes indicadores no dashboard da Control",
+    "area": "Growth",
+    "solicitante": "Thiago",
+    "email": "thiago@controlf5.com.br",
+    "tipo": "Dashboard",
+    "prioridade": "media",
+    "status": "nova",
+    "projeto_id": null,
+    "data_abertura": "2026-03-16T16:54:59.744Z",
+    "data_atualizacao": "2026-03-16T16:54:59.744Z"
+  },
+  {
+    "id": "a0222de4-bfbe-409a-a0a4-a52576f16ca8",
+    "titulo": "Atualização Indicadores Control",
+    "descricao": "Inserir novos indicadores",
+    "area": "Growth",
+    "solicitante": "Th",
+    "email": "xxx@W.com",
+    "tipo": "Dashboard",
+    "prioridade": "media",
+    "status": "nova",
+    "projeto_id": null,
+    "data_abertura": "2026-03-16T16:37:21.461Z",
+    "data_atualizacao": "2026-03-16T16:37:21.461Z"
+  },
+  {
+    "id": "74985fc1-6c13-4547-9c96-e3e4e96b610f",
+    "titulo": "Atualização dashboard",
+    "descricao": "Teste teste teste",
+    "area": "Growth",
+    "solicitante": "Thiagi",
+    "email": "irhidij@x.com",
+    "tipo": "Dashboard",
+    "prioridade": "media",
+    "status": "nova",
+    "projeto_id": null,
+    "data_abertura": "2026-03-16T16:27:17.051Z",
+    "data_atualizacao": "2026-03-16T16:27:17.051Z"
+  }
+]

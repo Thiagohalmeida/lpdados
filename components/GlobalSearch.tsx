@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, X, FileText, BarChart3, BookOpen, Wrench, FolderKanban } from 'lucide-react';
+import { Search, X, FileText, BarChart3, BookOpen, Wrench, FolderKanban, ClipboardPlus, HeartPulse } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -137,12 +137,14 @@ function ResultadoItem({
   const { tipo, item } = resultado;
   
   const getTipoConfig = () => {
-    const configs = {
+    const configs: Record<ResultadoBusca['tipo'], { label: string; icon: typeof FolderKanban; color: string }> = {
       projeto: { label: 'Projeto', icon: FolderKanban, color: 'text-blue-600' },
       dashboard: { label: 'Dashboard', icon: BarChart3, color: 'text-purple-600' },
       doc: { label: 'Documentação', icon: FileText, color: 'text-green-600' },
       ferramenta: { label: 'Ferramenta', icon: Wrench, color: 'text-orange-600' },
       pesquisa: { label: 'Pesquisa', icon: BookOpen, color: 'text-pink-600' },
+      demanda: { label: 'Demanda', icon: ClipboardPlus, color: 'text-amber-600' },
+      'tabela-status': { label: 'Saúde dos Dados', icon: HeartPulse, color: 'text-cyan-600' },
     };
     return configs[tipo];
   };

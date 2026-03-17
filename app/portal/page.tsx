@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  ClipboardPlus,
   Database,
   FileText,
   TrendingUp,
@@ -34,6 +35,7 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { SkeletonCard, SkeletonCardSmall } from "@/components/ui/SkeletonCard";
 import type { Projeto, Dashboard, Documentacao, Ferramenta, Pesquisa } from "@/types/bi-platform";
+import { platformRoutes, portalTabs } from "@/lib/platform-config";
 
 function normalizar(str: string) {
   return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
@@ -138,11 +140,32 @@ export default function BIPortfolioPage() {
             </a>
           </nav> */}
 
-          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
             <GlobalSearch />
-            
+
+            <Link href={platformRoutes.help}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-200 hover:bg-blue-50 bg-transparent text-blue-700"
+              >
+                Central de Ajuda
+              </Button>
+            </Link>
+
+            <Link href={platformRoutes.newRequest}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-200 hover:bg-blue-50 bg-transparent text-blue-700"
+              >
+                <ClipboardPlus className="h-4 w-4 mr-2" />
+                Nova solicitacao
+              </Button>
+            </Link>
+
             {/* Botão Admin */}
-            <Link href="/admin">
+            <Link href={platformRoutes.admin}>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -201,42 +224,20 @@ export default function BIPortfolioPage() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-200/30 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl"></div>
       </section>
-
       {/* Main Content */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <Tabs defaultValue="projetos" className="w-full">
             <TabsList className="grid w-full grid-cols-5 mb-8 bg-gradient-to-r from-blue-50 to-purple-50">
-              <TabsTrigger
-                value="projetos"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Projetos
-              </TabsTrigger>
-              <TabsTrigger
-                value="dashboards"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Dashboards
-              </TabsTrigger>
-              <TabsTrigger
-                value="documentacao"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Documentação
-              </TabsTrigger>
-              <TabsTrigger
-                value="ferramentas"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Ferramentas
-              </TabsTrigger>
-              <TabsTrigger
-                value="pesquisas"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-              >
-                Pesquisas
-              </TabsTrigger>
+              {portalTabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             {/* Projetos Tab */}
